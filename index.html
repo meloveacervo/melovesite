@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap');
+        body { background-color: #1a1a24; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Helvetica, Ubuntu, Roboto, Noto, "Segoe UI", Arial, sans-serif; }
+        .logo-italic { font-family: 'Playfair Display', serif; font-style: italic; }
+        .title-serif { font-family: 'Playfair Display', serif; }
+        #tabs { scrollbar-width: none; }
+        #tabs::-webkit-scrollbar { display: none; }
+        .poster-hover:hover { transform: scale(1.05); transition: 0.3s; cursor: pointer; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 26, 36, 0.98); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #3a3a4c; border-radius: 4px; }
+    </style>
+</head>
+<body class="p-6 md:px-20">
+    <header class="text-center py-8">
+        <h1 class="logo-italic text-6xl text-white cursor-pointer" onclick="render(appData.catalogo)">melove</h1>
+    </header>
+
+    <div class="max-w-2xl mx-auto mb-8">
+        <input id="search" type="text" placeholder="Buscar título, gênero, autor..." class="w-full p-4 rounded-full bg-[#252535] border border-gray-700 outline-none focus:border-pink-500 text-center text-sm">
+        <div id="tabs" class="flex justify-start md:justify-center gap-4 mt-6 overflow-x-auto whitespace-nowrap pb-2"></div>
+    </div>
+
+    <div id="grid" class="grid grid-cols-3 gap-4 md:gap-8 max-w-4xl mx-auto pb-10"></div>
+
+    <div id="modal" onclick="fecharModalManual()">
+        <div onclick="event.stopPropagation()" class="bg-[#1a1a24] md:bg-[#252535] p-6 md:p-10 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scroll relative shadow-2xl">
+            <button onclick="fecharModalManual()" class="absolute top-4 right-5 text-gray-400 hover:text-white text-2xl">✕</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // ======= COLE O LINK DO APPS SCRIPT NA LINHA ABAIXO =======
+        const API_URL = "https://script.google.com/macros/s/AKfycbzgjDrnA3p5WtQNmlRaZiN5Fq2W2rMi4Urpg1NHPEc/dev"; 
+        
+        let appData = { catalogo: [], episodios: [] };
+        const tipos = ['Tudo', 'Filme', 'Anime', 'Dorama', 'Série', 'Livros', 'Mangás', 'Documentário', 'Reality'];
+
+        // Novo método para buscar dados (fetch)
+        fetch(API_URL)
+            .then(response => response.json())
+            .then(res => {
+                appData = res;
+                render(appData.catalogo);
+                setupTabs();
+            })
+            .catch(error => alert("Erro ao carregar os dados. Verifique o link da API!"));
+
+        const clean = (str) => str ? str.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+
+        function render(list, filter = 'Tudo') {
+            const grid = document.getElementById('grid');
+            const filtered = (filter === 'Tudo') ? list : list.filter(r => 
+                clean(r[2]).includes(clean(filter)) || clean(filter).includes(clean(r[2])) || clean(r[3]).includes(clean(filter))
+            );
+
+            grid.innerHTML = filtered.map((r, i) => `
+                <div class="poster-hover" onclick="abrirModal(${appData.catalogo.indexOf(r)})">
+                    <img src="${r[14]}" class="rounded-xl w-full aspect-[2/3] object-cover shadow-lg">
+                </div>`).join('');
+        }
+
+        function setupTabs() {
+            document.getElementById('tabs').innerHTML = tipos.map(t => 
+                `<button onclick="document.getElementById('search').value=''; render(appData.catalogo, '${t}')" class="px-5 py-1 rounded-full bg-[#252535] text-xs hover:bg-gray-600 transition">${t}</button>`).join('');
+        }
+
+        document.getElementById('search').oninput = (e) => {
+            const v = clean(e.target.value);
+            render(appData.catalogo.filter(r => clean(r.join(" ")).includes(v)));
+        };
+
+        function abrirModal(index) {
+            const r = appData.catalogo[index];
+            const isSerie = clean(r[2]).includes('serie') || clean(r[2]).includes('dorama') || clean(r[2]).includes('anime');
+            const isLivro = clean(r[2]).includes('livro') || clean(r[2]).includes('manga');
+            const eps = appData.episodios.filter(e => e[0] === r[0]);
+
+            let generosHTML = `<span class="px-4 py-1 bg-[#3a3a4c] rounded-full text-[11px] font-bold text-white mr-1">${r[2] || 'Obra'}</span>`;
+            if (r[3]) {
+                generosHTML += r[3].split(',').map(g => g.trim()).map(g => 
+                    `<button onclick="filtrarPeloModal('${g}')" class="px-4 py-1 bg-[#252535] border border-gray-600 rounded-full text-[11px] hover:bg-[#3a3a4c] transition">${g}</button>`
+                ).join(' ');
+            }
+
+            let acoesHTML = '';
+            if (isLivro) {
+                acoesHTML = `
+                    <p class="text-xs text-gray-400 mb-3">${r[10] || 'Editora'} | ${r[9] || 'Idioma'}</p>
+                    <div class="flex items-center gap-4 mb-3">
+                        <button class="bg-[#3a3a4c] px-10 py-2 rounded-full text-xs font-bold hover:bg-gray-600 transition">Ler</button>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="${r[16]}" target="_blank" class="bg-[#252535] border border-gray-600 px-6 py-2 rounded-full text-xs hover:bg-[#3a3a4c] flex items-center gap-2">epub <span class="text-lg leading-none">↓</span></a>
+                    </div>`;
+            } else if (!isSerie) {
+                acoesHTML = `
+                    <div class="flex flex-col gap-3 mb-2">
+                        <a href="${r[16]}" target="_blank" class="bg-[#3a3a4c] px-6 py-2 rounded-full text-xs hover:bg-gray-600 transition flex items-center justify-between w-48">
+                            <span class="flex items-center gap-2">▶ Legendado</span> <span class="text-lg leading-none">↓</span>
+                        </a>
+                    </div>`;
+            }
+
+            let altTitles = r[1] ? `<div class="mt-6 mb-4"><h4 class="font-bold text-sm text-white">Outros títulos:</h4><p class="text-xs text-gray-400 leading-tight">${r[1]}</p></div>` : '';
+
+            let modalHTML = `
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-1 order-2 md:order-1">
+                        <h2 class="title-serif text-4xl text-white mb-1">${r[0]}</h2>
+                        <p class="text-sm text-gray-400 mb-3 italic">por ${r[7] || 'Desconhecido'}</p>
+                        <div class="flex items-center gap-2 text-xs text-gray-300 mb-4">
+                            <span>${r[4] || '-'}</span> | <span class="bg-[#c99a45] text-black px-1.5 py-0.5 rounded font-bold">${r[5] || 'L'}</span> | 
+                            <span>${r[8] || '-'}</span> | <span>${r[6] || '-'} ♥</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-6">${generosHTML}</div>
+                        ${acoesHTML}
+                        ${altTitles}
+                        <p class="text-sm text-gray-300 leading-relaxed text-justify mt-6">${r[13] || 'Sinopse indisponível.'}</p>
+                    </div>
+                    <div class="w-full md:w-1/2 flex justify-center md:justify-end order-1 md:order-2">
+                        <img src="${r[14]}" class="w-48 md:w-full max-w-[280px] rounded-xl shadow-2xl aspect-[2/3] object-cover">
+                    </div>
+                </div>`;
+
+            if (isSerie && eps.length > 0) {
+                modalHTML += `
+                <div class="mt-10 border-t border-gray-700 pt-6">
+                    <div class="flex items-center gap-4 mb-6"><h3 class="text-xl title-serif text-white">Temporada 1:</h3><button class="bg-[#3a3a4c] px-4 py-1 rounded-full text-[11px] font-bold">Legendado</button></div>
+                    <div class="flex flex-col gap-4">
+                        ${eps.map(e => `
+                            <div class="flex items-center gap-4">
+                                <div class="w-24 h-14 bg-black rounded-lg flex items-center justify-center relative shadow"><span class="text-white text-xs">▶</span></div>
+                                <div class="flex-1 flex justify-between items-center bg-[#252535] p-3 rounded-lg hover:border-gray-500 border border-transparent transition">
+                                    <span class="text-sm font-bold">${e[2]}. ${e[4] || ''}</span>
+                                    <div class="flex items-center gap-4 text-xs text-gray-400"><span>${e[5] || '24m'}</span><a href="${e[8]}" target="_blank" class="text-lg hover:text-white transition">↓</a></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            }
+
+            document.getElementById('modalContent').innerHTML = modalHTML;
+            document.getElementById('modal').style.display = 'flex';
+            history.pushState({ modalAberto: true }, "", "#detalhes");
+        }
+
+        function fecharModalManual() { history.back(); }
+        function filtrarPeloModal(genero) { fecharModalManual(); setTimeout(() => { document.getElementById('search').value = ''; render(appData.catalogo, genero); }, 100); }
+        window.addEventListener('popstate', function() { document.getElementById('modal').style.display = 'none'; });
+    </script>
+</body>
+</html>
