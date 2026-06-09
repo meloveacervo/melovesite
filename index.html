@@ -27,6 +27,10 @@
         <div id="tabs" class="flex justify-start md:justify-center gap-4 mt-6 overflow-x-auto whitespace-nowrap pb-2"></div>
     </div>
 
+    <div id="loading" class="text-center text-pink-400 italic font-serif mt-10 text-xl">
+        ★ carregando acervo...
+    </div>
+
     <div id="grid" class="grid grid-cols-3 gap-4 md:gap-8 max-w-4xl mx-auto pb-10"></div>
 
     <div id="modal" onclick="fecharModalManual()">
@@ -43,15 +47,19 @@
         let appData = { catalogo: [], episodios: [] };
         const tipos = ['Tudo', 'Filme', 'Anime', 'Dorama', 'Série', 'Livros', 'Mangás', 'Documentário', 'Reality'];
 
-        // Novo método para buscar dados (fetch)
-        fetch(API_URL)
+        // Chamada corrigida com 'redirect: follow' (Obrigatório para o Google)
+        fetch(API_URL, { redirect: "follow" })
             .then(response => response.json())
             .then(res => {
+                document.getElementById('loading').style.display = 'none'; // Esconde o aviso de carregando
                 appData = res;
                 render(appData.catalogo);
                 setupTabs();
             })
-            .catch(error => alert("Erro ao carregar os dados. Verifique o link da API!"));
+            .catch(error => {
+                document.getElementById('loading').innerHTML = "Ocorreu um erro ao conectar com o catálogo. Verifique o link da API!";
+                document.getElementById('loading').style.color = "red";
+            });
 
         const clean = (str) => str ? str.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
 
