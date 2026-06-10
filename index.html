@@ -66,17 +66,22 @@
     <script>
         const LINK_CATALOGO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=1306030388&single=true&output=csv"; 
         const LINK_EPISODIOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=2112766704&single=true&output=csv"; 
+        const LINK_COMENTARIOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=40184193&single=true&output=csv"; 
 
-        let appData = { catalogo: [], episodios: [] };
+        const API_COMENTARIOS = "https://script.google.com/macros/s/AKfycbzmVNHQcgfjIF4MLp__HoxAfirlsE3dAhH4vg5pd_o_awhW5LZhehFwwVCni4WcuQuN/exec";
+
+        let appData = { catalogo: [], episodios: [], comentarios: [] };
         const tipos = ['Tudo', 'Filme', 'Anime', 'Dorama', 'Série', 'Livros', 'Mangás', 'Documentário', 'Reality'];
 
         Promise.all([
             new Promise(resolve => Papa.parse(LINK_CATALOGO, { download: true, complete: resolve })),
-            new Promise(resolve => Papa.parse(LINK_EPISODIOS, { download: true, complete: resolve }))
+            new Promise(resolve => Papa.parse(LINK_EPISODIOS, { download: true, complete: resolve })),
+            new Promise(resolve => Papa.parse(LINK_COMENTARIOS, { download: true, complete: resolve }))
         ]).then(results => {
             document.getElementById('loading').style.display = 'none';
             appData.catalogo = results[0].data.slice(1).filter(r => r.length > 5);
             appData.episodios = results[1].data.slice(1).filter(r => r.length > 5);
+            appData.comentarios = results[2].data.slice(1).filter(r => r.length >= 2);
             
             render(appData.catalogo);
             setupTabs();
@@ -87,7 +92,6 @@
 
         const clean = (str) => str ? str.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
 
-        // O grid permanece em colunas de 3 mantendo o dinamismo do seu design original
         function render(list, filter = 'Tudo') {
             const grid = document.getElementById('grid');
             const filtered = (filter === 'Tudo') ? list : list.filter(r => 
@@ -115,6 +119,7 @@
             const isSerie = clean(r[2]).includes('serie') || clean(r[2]).includes('dorama') || clean(r[2]).includes('anime');
             const isLivro = clean(r[2]).includes('livro') || clean(r[2]).includes('manga');
             const eps = appData.episodios.filter(e => e[0] === r[0]);
+            const comments = appData.comentarios.filter(c => clean(c[0]) === clean(r[0]));
 
             let generosHTML = `<span class="px-4 py-1 bg-[#3a3a4c] rounded-full text-[11px] font-bold text-white mr-1">${r[2] || 'Obra'}</span>`;
             if (r[3]) {
@@ -131,69 +136,4 @@
                         <button class="bg-[#3a3a4c] px-10 py-2 rounded-full text-xs font-bold hover:bg-gray-600 transition">Ler</button>
                     </div>
                     <div class="flex gap-3">
-                        <a href="${r[16]}" target="_blank" class="bg-[#252535] border border-gray-600 px-6 py-2 rounded-full text-xs hover:bg-[#3a3a4c] flex items-center gap-2">epub <span class="text-lg leading-none">↓</span></a>
-                    </div>`;
-            } else if (!isSerie) {
-                acoesHTML = `
-                    <div class="flex flex-col gap-3 mb-2">
-                        <a href="${r[16]}" target="_blank" class="bg-[#3a3a4c] px-6 py-2 rounded-full text-xs hover:bg-gray-600 transition flex items-center justify-between w-48">
-                            <span class="flex items-center gap-2">▶ Legendado</span> <span class="text-lg leading-none">↓</span>
-                        </a>
-                    </div>`;
-            }
-
-            let altTitles = r[1] ? `
-                <div class="mt-6 mb-4">
-                    <h4 class="font-bold text-sm text-white">Outros títulos:</h4>
-                    <p class="text-xs text-gray-400 leading-tight">${r[1]}</p>
-                </div>` : '';
-
-            // Layout com fontes estilizadas, imagem na direita e texto com alinhamento justificado
-            let modalHTML = `
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="flex-1 order-2 md:order-1">
-                        <h2 class="title-serif text-4xl text-white mb-1">${r[0]}</h2>
-                        <p class="text-sm text-gray-400 mb-3 italic">por ${r[7] || 'Desconhecido'}</p>
-                        <div class="flex items-center gap-2 text-xs text-gray-300 mb-4">
-                            <span>${r[4] || '-'}</span> | <span class="bg-[#c99a45] text-black px-1.5 py-0.5 rounded font-bold">${r[5] || 'L'}</span> | 
-                            <span>${r[8] || '-'}</span> | <span>${r[6] || '-'} ♥</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mb-6">${generosHTML}</div>
-                        ${acoesHTML}
-                        ${altTitles}
-                        <p class="text-sm text-gray-300 leading-relaxed text-justify mt-6">${r[13] || 'Sinopse indisponível.'}</p>
-                    </div>
-                    <div class="w-full md:w-1/2 flex justify-center md:justify-end order-1 md:order-2">
-                        <img src="${r[14]}" class="w-48 md:w-full max-w-[280px] rounded-xl shadow-2xl aspect-[2/3] object-cover" onerror="this.src='https://via.placeholder.com/200x300/252535/ffffff?text=Sem+Capa'">
-                    </div>
-                </div>`;
-
-            if (isSerie && eps.length > 0) {
-                modalHTML += `
-                <div class="mt-10 border-t border-gray-700 pt-6">
-                    <div class="flex items-center gap-4 mb-6"><h3 class="text-xl title-serif text-white">Temporada 1:</h3><button class="bg-[#3a3a4c] px-4 py-1 rounded-full text-[11px] font-bold">Legendado</button></div>
-                    <div class="flex flex-col gap-4">
-                        ${eps.map(e => `
-                            <div class="flex items-center gap-4">
-                                <div class="w-24 h-14 bg-black rounded-lg flex items-center justify-center relative shadow"><span class="text-white text-xs">▶</span></div>
-                                <div class="flex-1 flex justify-between items-center bg-[#252535] p-3 rounded-lg hover:border-gray-500 border border-transparent transition">
-                                    <span class="text-sm font-bold">${e[2]}. ${e[4] || ''}</span>
-                                    <div class="flex items-center gap-4 text-xs text-gray-400"><span>${e[5] || '24m'}</span><a href="${e[8]}" target="_blank" class="text-lg hover:text-white transition">↓</a></div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>`;
-            }
-
-            document.getElementById('modalContent').innerHTML = modalHTML;
-            document.getElementById('modal').style.display = 'flex';
-            history.pushState({ modalAberto: true }, "", "#detalhes");
-        }
-
-        function fecharModalManual() { history.back(); }
-        function filtrarPeloModal(genero) { fecharModalManual(); setTimeout(() => { document.getElementById('search').value = ''; render(appData.catalogo, genero); }, 100); }
-        window.addEventListener('popstate', function() { document.getElementById('modal').style.display = 'none'; });
-    </script>
-</body>
-</html>
+                        <a href="${r[16]}" target="_blank" class="
