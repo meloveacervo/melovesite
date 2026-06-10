@@ -6,17 +6,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;600&display=swap');
         
         body { 
             background-color: #1a1a24; 
-            color: #ffffff; 
-            /* A fonte nativa do iOS de volta! */
-            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Helvetica, Ubuntu, Roboto, Noto, "Segoe UI", Arial, sans-serif; 
+            color: #e4e4e7; 
+            font-family: 'Inter', sans-serif; 
         }
         
-        .logo-italic { font-family: 'Playfair Display', serif; font-style: italic; }
-        .title-serif { font-family: 'Playfair Display', serif; }
+        .logo-italic { 
+            font-family: 'Cormorant Garamond', serif; 
+            font-style: italic; 
+            font-weight: 400;
+        }
+        
+        .title-serif { 
+            font-family: 'Cormorant Garamond', serif; 
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
         
         #tabs { scrollbar-width: none; }
         #tabs::-webkit-scrollbar { display: none; }
@@ -56,7 +64,6 @@
     </div>
 
     <script>
-        // Os links mágicos já estão aqui
         const LINK_CATALOGO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=1306030388&single=true&output=csv"; 
         const LINK_EPISODIOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=2112766704&single=true&output=csv"; 
 
@@ -80,6 +87,7 @@
 
         const clean = (str) => str ? str.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
 
+        // O grid permanece em colunas de 3 mantendo o dinamismo do seu design original
         function render(list, filter = 'Tudo') {
             const grid = document.getElementById('grid');
             const filtered = (filter === 'Tudo') ? list : list.filter(r => 
@@ -140,7 +148,7 @@
                     <p class="text-xs text-gray-400 leading-tight">${r[1]}</p>
                 </div>` : '';
 
-            // Layout recuperado: Imagem na direita, Informações na esquerda, Sinopse justificada
+            // Layout com fontes estilizadas, imagem na direita e texto com alinhamento justificado
             let modalHTML = `
                 <div class="flex flex-col md:flex-row gap-8">
                     <div class="flex-1 order-2 md:order-1">
