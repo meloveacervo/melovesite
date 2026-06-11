@@ -360,6 +360,7 @@
             display: flex;
             align-items: center;
             gap: 30px;
+            margin-bottom: 30px;
         }
         .links-livro-col {
             display: flex;
@@ -523,19 +524,10 @@
         ::::
          ::`;
 
-        // ==========================================================================
-        // INICIALIZAÇÃO ASSÍNCRONA E NAVEGAÇÃO
-        // ==========================================================================
         window.addEventListener('load', async () => {
             history.replaceState({ navegação: 'home' }, '');
-            
-            // 1. Inicia o Transplante de Cérebro (Baixa os dados)
             await carregarBancoDeDados();
-            
-            // 2. Acorda as funções do site
             configurarBuscador();
-            
-            // 3. Libera a visualização
             document.getElementById("viewHome").classList.remove("hidden");
             document.getElementById("footerTexto").classList.remove("hidden");
             atualizarContadorObrasGeral(bancoDadosObras.length);
@@ -543,38 +535,23 @@
 
         async function carregarBancoDeDados() {
             try {
-                // Dispara o download das 3 abas ao mesmo tempo para ser super rápido
                 const [resCat, resLinks, resEps] = await Promise.all([
                     fetch(URL_CATALOGO).then(r => r.text()),
                     fetch(URL_LINKS_UNICOS).then(r => r.text()),
                     fetch(URL_EPISODIOS).then(r => r.text())
                 ]);
 
-                // Configura o conversor para entender a planilha
-                const configPapa = { 
-                    header: true, 
-                    skipEmptyLines: true, 
-                    transformHeader: h => h.trim() 
-                };
-                
-                // Popula as Obras
+                const configPapa = { header: true, skipEmptyLines: true, transformHeader: h => h.trim() };
                 bancoDadosObras = Papa.parse(resCat, configPapa).data;
                 
-                // Popula e organiza os Links Únicos
                 const arrLinks = Papa.parse(resLinks, configPapa).data;
-                arrLinks.forEach(l => { 
-                    bancoLinksUnicos[l.id_obra] = l; 
-                });
+                arrLinks.forEach(l => { bancoLinksUnicos[l.id_obra] = l; });
 
-                // Popula e agrupa os Episódios
                 const arrEps = Papa.parse(resEps, configPapa).data;
                 arrEps.forEach(ep => {
-                    if (!bancoEpisodios[ep.id_obra]) {
-                        bancoEpisodios[ep.id_obra] = [];
-                    }
+                    if (!bancoEpisodios[ep.id_obra]) bancoEpisodios[ep.id_obra] = [];
                     bancoEpisodios[ep.id_obra].push(ep);
                 });
-
             } catch (erro) {
                 console.error("Erro fatal ao sincronizar:", erro);
                 document.getElementById("subtextoDinamicoBusca").textContent = "ERRO DE CONEXÃO COM A PLANILHA.";
@@ -587,9 +564,7 @@
                 fecharModalVisual();
                 return;
             }
-
             const estado = event.state.navegação;
-            
             if (estado === 'home') {
                 renderizarVisualHome();
                 fecharModalVisual();
@@ -617,9 +592,6 @@
             }
         }
 
-        // ==========================================================================
-        // RENDERIZAÇÃO DAS TELAS
-        // ==========================================================================
         function atualizarContadorObrasGeral(total) {
             document.getElementById("subtextoDinamicoBusca").textContent = `${total} OBRAS AO TOTAL...`;
         }
@@ -643,7 +615,6 @@
             document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
 
             let filtradas = cat === 'Todos' ? [...bancoDadosObras] : bancoDadosObras.filter(o => (o.categoria || "").toLowerCase() === cat.toLowerCase());
-            
             filtradas.sort((a, b) => {
                 let dataA = a.data_adicao || "01/01/2000";
                 let dataB = b.data_adicao || "01/01/2000";
@@ -662,7 +633,6 @@
             document.getElementById("viewGeneros").classList.remove("hidden");
             document.getElementById("footerTexto").classList.add("hidden");
             document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
-            
             renderizarListaGeneros();
         }
 
@@ -670,11 +640,7 @@
             const input = document.getElementById("campoPesquisa");
             input.addEventListener("input", (e) => {
                 let termo = e.target.value.toLowerCase().trim();
-                
-                if(termo === "") { 
-                    navegarPara('home'); 
-                    return; 
-                }
+                if(termo === "") { navegarPara('home'); return; }
                 
                 document.getElementById("viewHome").classList.add("hidden");
                 document.getElementById("viewCatalogo").classList.remove("hidden");
@@ -724,7 +690,6 @@
                 });
             });
             let arr = Object.keys(mapaGeneros).map(k => ({nome: k, qtd: mapaGeneros[k]}));
-            
             arr.sort((a,b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome));
             
             document.getElementById("tituloAbaGeneros").innerHTML = `GÊNEROS <span>${arr.length}</span>`;
@@ -742,7 +707,6 @@
             document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
             
             let filtradas = bancoDadosObras.filter(o => (o.generos || "").toLowerCase().includes(nomeG.toLowerCase()));
-            
             filtradas.sort((a, b) => {
                 let dataA = a.data_adicao || "01/01/2000";
                 let dataB = b.data_adicao || "01/01/2000";
@@ -760,9 +724,7 @@
             abrirModalVisual(id, true);
         }
 
-        function fecharModalPeloBotao() {
-            history.back();
-        }
+        function fecharModalPeloBotao() { history.back(); }
 
         function fecharModalVisual() {
             document.getElementById("modalObra").classList.add("hidden");
@@ -786,7 +748,6 @@
             let altTitulos = (obra.titulos_alternativos || "").replace(/\\n/g, '<br>');
             let outrosTitulosHtml = altTitulos ? `<div class="bloco-outros-titulos"><div class="label-outros-titulos">Outros títulos:</div><div class="conteudo-outros-titulos">${altTitulos}</div></div>` : "";
 
-            // Obras sem duracao ou info extra tratadas graciosamente
             let duracao = obra.duracao_paginas ? ` | ${obra.duracao_paginas}` : "";
             let infoExtra = obra.info_extra ? `<div class="linha-tecnica">${obra.info_extra}</div>` : "";
 
@@ -807,17 +768,28 @@
                     <img class="capa-livro-modal" src="${obra.capa_vertical}" alt="${obra.titulo_principal}">
                 </div>
                 ${sinopseHtml}
-                <div class="bloco-links-livro">
-                    <div class="borboleta-mini-area">
-                        <pre style="font-family:monospace; font-size:3px; line-height:1; color:#000;">${separatorASCII}</pre>
-                    </div>
-                    <div class="links-livro-col">
-                        <a class="link-livro" href="${link.link_epub || "#"}" target="_blank">epub</a>
-                        <a class="link-livro" href="${link.link_pdf || "#"}" target="_blank">pdf</a>
-                        <a class="link-livro" href="${link.link_ler_online || "#"}" target="_blank">ler<br>online</a>
-                    </div>
-                </div>
                 `;
+
+                // Logica do Detetive de Links para Livros
+                let linksLivroHtml = "";
+                if(link.link_epub && link.link_epub.trim() !== "") linksLivroHtml += `<a class="link-livro" href="${link.link_epub}" target="_blank">epub</a>`;
+                if(link.link_pdf && link.link_pdf.trim() !== "") linksLivroHtml += `<a class="link-livro" href="${link.link_pdf}" target="_blank">pdf</a>`;
+                if(link.link_ler_online && link.link_ler_online.trim() !== "") linksLivroHtml += `<a class="link-livro" href="${link.link_ler_online}" target="_blank">ler<br>online</a>`;
+
+                if(linksLivroHtml !== "") {
+                    html += `
+                    <div class="bloco-links-livro">
+                        <div class="borboleta-mini-area">
+                            <pre style="font-family:monospace; font-size:3px; line-height:1; color:#000;">${separatorASCII}</pre>
+                        </div>
+                        <div class="links-livro-col">
+                            ${linksLivroHtml}
+                        </div>
+                    </div>`;
+                } else {
+                    html += `<div style="text-align:center; margin-bottom:30px;"><span style="font-size:12px; color:var(--texto-mutado);">Arquivos indisponíveis.</span></div>`;
+                }
+
             } else if (cat === 'filme' || cat === 'animação') {
                 let link = bancoLinksUnicos[id] || {};
                 let vistos = { leg: verificarSeFoiVisto(`filme_${id}_leg`), dub: verificarSeFoiVisto(`filme_${id}_dub`) };
@@ -834,18 +806,30 @@
                     ${outrosTitulosHtml}
                 </div>
                 ${sinopseHtml}
-                <div class="bloco-links-filme">
-                    <span class="link-streaming ${vistos.leg?'visto':''}" onclick="dispararMiniCinema('${link.link_legendado}', this, 'filme_${id}_leg')">Legendado</span>
-                    <div class="borboleta-mini-area">
-                        <pre style="font-family:monospace; font-size:3px; line-height:1; color:#000;">${separatorASCII}</pre>
-                    </div>
-                    <span class="link-streaming ${vistos.dub?'visto':''}" onclick="dispararMiniCinema('${link.link_dublado}', this, 'filme_${id}_dub')">Dublado</span>
-                </div>
-                <div class="bloco-legendas">
-                    <div class="label-legendas">Legendas disponíveis</div>
-                    <div style="color:var(--texto-mutado); white-space:pre-wrap;">${link.legendas_disponiveis || "Não Informada."}</div>
-                </div>
                 `;
+
+                // Logica do Detetive de Links para Filmes
+                let temLeg = link.link_legendado && link.link_legendado.trim() !== "";
+                let temDub = link.link_dublado && link.link_dublado.trim() !== "";
+
+                if(temLeg || temDub) {
+                    html += `<div class="bloco-links-filme">`;
+                    if(temLeg) html += `<span class="link-streaming ${vistos.leg?'visto':''}" onclick="dispararMiniCinema('${link.link_legendado}', this, 'filme_${id}_leg')">Legendado</span>`;
+                    if(temLeg && temDub) html += `<div class="borboleta-mini-area"><pre style="font-family:monospace; font-size:3px; line-height:1; color:#000;">${separatorASCII}</pre></div>`;
+                    if(temDub) html += `<span class="link-streaming ${vistos.dub?'visto':''}" onclick="dispararMiniCinema('${link.link_dublado}', this, 'filme_${id}_dub')">Dublado</span>`;
+                    html += `</div>`;
+                } else {
+                    html += `<div style="text-align:center; margin-bottom:30px;"><span style="font-size:12px; color:var(--texto-mutado);">Links indisponíveis no momento.</span></div>`;
+                }
+
+                if(link.legendas_disponiveis && link.legendas_disponiveis.trim() !== "") {
+                    html += `
+                    <div class="bloco-legendas">
+                        <div class="label-legendas">Legendas disponíveis</div>
+                        <div style="color:var(--texto-mutado); white-space:pre-wrap;">${link.legendas_disponiveis}</div>
+                    </div>`;
+                }
+
             } else {
                 let eps = bancoEpisodios[id] || [];
                 let infoEps = obra.info_extra ? ` | ${obra.info_extra}` : "";
@@ -888,6 +872,15 @@
                     let kDub = `serie_${id}_t${ep.temporada_numero}_ep${ep.episodio_numero}_dub`;
                     let vistos = { leg: verificarSeFoiVisto(kLeg), dub: verificarSeFoiVisto(kDub) };
 
+                    let epLinksHtml = "";
+                    if(ep.link_legendado && ep.link_legendado.trim() !== "") {
+                        epLinksHtml += `<span class="ep-link-btn ${vistos.leg?'visto':''}" onclick="dispararMiniCinema('${ep.link_legendado}', this, '${kLeg}')">Legendado</span>`;
+                    }
+                    if(ep.link_dublado && ep.link_dublado.trim() !== "") {
+                        epLinksHtml += `<span class="ep-link-btn ${vistos.dub?'visto':''}" onclick="dispararMiniCinema('${ep.link_dublado}', this, '${kDub}')">Dublado</span>`;
+                    }
+                    if(epLinksHtml === "") epLinksHtml = `<span style="font-size:10px; color:var(--texto-mutado);">Em breve</span>`;
+
                     html += `
                     <div class="item-episodio">
                         <div class="ep-info-esquerda">
@@ -896,8 +889,7 @@
                         </div>
                         <div class="ep-links-direita">
                             <span class="ep-duracao">${ep.duracao_episodio || ""}</span>
-                            <span class="ep-link-btn ${vistos.leg?'visto':''}" onclick="dispararMiniCinema('${ep.link_legendado}', this, '${kLeg}')">Legendado</span>
-                            <span class="ep-link-btn ${vistos.dub?'visto':''}" onclick="dispararMiniCinema('${ep.link_dublado}', this, '${kDub}')">Dublado</span>
+                            ${epLinksHtml}
                         </div>
                     </div>
                     `;
