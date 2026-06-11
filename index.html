@@ -3,137 +3,966 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <title>melove — um acervo juntando coisinhas</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;600&display=swap');
-        
-        body { 
-            background-color: #1a1a24; 
-            color: #e4e4e7; 
-            font-family: 'Inter', sans-serif; 
+        :root {
+            --bg-principal: #ffffff;
+            --texto-escuro: #000000;
+            --texto-mutado: #888888;
+            --linha-fina: #e0e0e0;
+            
+            --font-titulo: 'Boho Serif', 'Cormorant Garamond', serif;
+            --font-mono: 'Space Mono', monospace;
+            --font-detalhes: 'Space Mono', monospace;
+            --font-alternativa: 'Plus Jakarta Sans', sans-serif;
+            
+            --cl-livre: #2ecc71;
+            --cl-10: #3498db;
+            --cl-12: #f1c40f;
+            --cl-14: #e67e22;
+            --cl-16: #e74c3c;
+            --cl-18: #000000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texto-escuro);
+            font-family: var(--font-mono);
+            overflow-x: hidden;
+            min-height: 100vh;
+            max-width: 500px; 
+            margin: 0 auto;
+            position: relative;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        .hidden { display: none !important; }
+
+        /* ==========================================================================
+           CABEÇALHO GLOBAL
+           ========================================================================== */
+        header {
+            text-align: center;
+            padding: 40px 20px 15px 20px;
+        }
+
+        .logo-site {
+            font-family: var(--font-titulo);
+            font-size: 56px;
+            letter-spacing: -2px;
+            cursor: pointer;
+            line-height: 1;
+            transform: scaleY(1.2);
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .descricao-site {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaaaaa;
+        }
+
+        /* ==========================================================================
+           BARRA DE PESQUISA
+           ========================================================================== */
+        .container-busca {
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+
+        .wrapper-input {
+            border: 1px solid var(--texto-escuro);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+        }
+
+        .icone-busca {
+            font-size: 14px;
+            margin-right: 10px;
+            transform: rotate(-45deg);
+            display: inline-block;
+        }
+
+        .input-busca {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            background: transparent;
+        }
+
+        .subtexto-busca {
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ==========================================================================
+           TELA INICIAL
+           ========================================================================== */
+        .tela-inicial {
+            position: relative;
+            height: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .borboleta-imagem {
+            max-width: 150px;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .categoria-flutuante {
+            position: absolute;
+            font-size: 10px;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
+            background: rgba(255,255,255,0.8);
+            padding: 2px 5px;
+            z-index: 10;
+        }
+        .categoria-flutuante:hover { font-weight: bold; }
+
+        #cat-catalogo   { top: 5%; left: 50%; transform: translateX(-50%); }
+        #cat-generos    { top: 20%; left: 10%; }
+        #cat-filmes     { top: 25%; right: 10%; }
+        #cat-series     { top: 60%; left: 12%; }
+        #cat-animes     { top: 65%; right: 15%; }
+        #cat-animacoes  { bottom: 15%; left: 25%; }
+        #cat-doramas    { bottom: 25%; left: 50%; transform: translateX(-50%); }
+        #cat-livros     { bottom: 10%; right: 20%; }
+
+        footer {
+            text-align: center;
+            font-size: 8px;
+            color: #aaaaaa;
+            padding: 40px 20px 20px 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ==========================================================================
+           ABA CATÁLOGO (3 Colunas)
+           ========================================================================== */
+        .titulo-aba {
+            font-family: var(--font-alternativa);
+            font-size: 18px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
         }
         
-        .logo-italic { 
-            font-family: 'Cormorant Garamond', serif; 
-            font-style: italic; 
-            font-weight: 400;
+        .titulo-aba span {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0;
+            font-weight: normal;
+        }
+
+        .grid-catalogo {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+
+        .item-obra {
+            cursor: pointer;
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+
+        .poster-imagem {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s ease;
+        }
+
+        .item-obra.status-off .poster-imagem { filter: grayscale(100%) brightness(40%); }
+        .item-obra.status-off::after {
+            content: "OFFLINE";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--cl-16);
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 8px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* ==========================================================================
+           ABA GÊNEROS
+           ========================================================================== */
+        .grid-generos {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px 10px;
+            padding: 0 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+        }
+
+        .linha-genero {
+            cursor: pointer;
+            color: var(--texto-mutado);
         }
         
-        .title-serif { 
-            font-family: 'Cormorant Garamond', serif; 
-            font-weight: 600;
-            letter-spacing: -0.02em;
+        .linha-genero:hover { color: var(--texto-escuro); font-weight: bold; }
+        .linha-genero span { color: var(--texto-escuro); margin-left: 5px; }
+
+        /* ==========================================================================
+           MODAL DE DETALHES
+           ========================================================================== */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; min-height: 100%;
+            background-color: var(--bg-principal);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .botao-fechar-modal {
+            text-align: right;
+            font-size: 24px;
+            font-family: var(--font-alternativa);
+            font-weight: 300;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .header-modal-filme { display: block; }
+        .banner-obra-modal {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .header-modal-livro {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .capa-livro-modal {
+            width: 130px;
+            aspect-ratio: 2 / 3;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
-        #tabs { scrollbar-width: none; }
-        #tabs::-webkit-scrollbar { display: none; }
-        .poster-hover:hover { transform: scale(1.05); transition: 0.3s; cursor: pointer; }
-        
-        #modal { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(26, 26, 36, 0.98); 
-            z-index: 100; align-items: center; justify-content: center; padding: 1rem; 
+        .info-bloco-esquerda { flex: 1; }
+
+        .titulo-obra-modal {
+            font-family: var(--font-titulo);
+            font-size: 38px;
+            line-height: 0.9;
+            transform: scaleY(1.2);
+            transform-origin: top left;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .autor-diretor-modal {
+            font-style: italic;
+            font-size: 11px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .linha-tecnica {
+            font-size: 11px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-classificacao {
+            padding: 1px 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            border-radius: 2px;
+        }
+
+        .container-tags-generos {
+            font-size: 11px;
+            margin-bottom: 15px;
+        }
+        .tag-modal { text-decoration: underline; margin-right: 8px; cursor: pointer; transition: font-weight 0.2s ease;}
+        .tag-modal:hover { font-weight: bold; }
+        .tag-modal.bold { font-weight: bold; }
+
+        .bloco-outros-titulos { margin-bottom: 20px; }
+        .label-outros-titulos { font-family: var(--font-titulo); font-size: 14px; }
+        .conteudo-outros-titulos { font-family: var(--font-alternativa); font-size: 11px; color: var(--texto-mutado); white-space: pre-wrap; }
+
+        .sinopse-modal {
+            font-size: 9px;
+            line-height: 1.5;
+            text-align: justify;
+            margin-bottom: 30px;
+        }
+
+        .bloco-links-filme {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .link-streaming { font-size: 14px; font-weight: bold; text-decoration: underline; cursor: pointer; }
+        .link-streaming.visto { color: #ccc !important; }
+
+        .bloco-legendas { font-size: 10px; }
+        .label-legendas { font-family: var(--font-titulo); font-size: 16px; margin-bottom: 5px; }
+
+        .bloco-links-livro {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .links-livro-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+        }
+        .link-livro { font-size: 16px; font-weight: bold; text-decoration: underline; cursor: pointer; }
+
+        .titulo-temporada-gatilho {
+            font-family: var(--font-titulo);
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            cursor: pointer;
+        }
+
+        .item-episodio {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            align-items: flex-start;
         }
         
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #3a3a4c; border-radius: 4px; }
+        .ep-info-esquerda {
+            flex: 1;
+            padding-right: 15px;
+        }
+        .ep-titulo-linha {
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+        .ep-num { font-weight: bold; }
+        .ep-sinopse {
+            font-size: 7px;
+            text-align: justify;
+            color: var(--texto-mutado);
+        }
+
+        .ep-links-direita {
+            text-align: right;
+            font-size: 10px;
+            min-width: 70px;
+        }
+        .ep-duracao { margin-bottom: 10px; display: block; }
+        .ep-link-btn {
+            font-weight: bold;
+            text-decoration: underline;
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .ep-link-btn.visto { color: #ccc !important; }
+
+        .wrapper-player-video {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .iframe-player { width: 100%; height: 100%; border: none; }
+
+        .container-comentarios-modal { margin-top: 40px; border-top: 1px solid var(--linha-fina); padding-top: 30px; }
+        .titulo-comentarios { font-family: var(--font-titulo); font-size: 18px; margin-bottom: 15px; }
+
     </style>
 </head>
-<body class="p-6 md:px-20">
-    <header class="text-center py-8">
-        <h1 class="logo-italic text-6xl text-white cursor-pointer" onclick="render(appData.catalogo)">melove</h1>
+<body>
+
+    <header>
+        <div class="logo-site" onclick="navegarPara('home')">melove</div>
+        <div class="descricao-site">um acervo juntando coisinhas</div>
     </header>
 
-    <div class="max-w-2xl mx-auto mb-8">
-        <input id="search" type="text" placeholder="Buscar título, gênero, autor..." class="w-full p-4 rounded-full bg-[#252535] border border-gray-700 outline-none focus:border-pink-500 text-center text-sm">
-        <div id="tabs" class="flex justify-start md:justify-center gap-4 mt-6 overflow-x-auto whitespace-nowrap pb-2"></div>
+    <div class="container-busca" id="areaBusca">
+        <div class="wrapper-input">
+            <span class="icone-busca">⚲</span>
+            <input type="text" id="campoPesquisa" class="input-busca">
+        </div>
+        <div id="subtextoDinamicoBusca" class="subtexto-busca">SINCRONIZANDO PLANILHA...</div>
     </div>
 
-    <div id="loading" class="text-center text-pink-400 italic font-serif mt-10 text-xl">
-        ★ carregando acervo...
-    </div>
+    <main id="conteudoPrincipal">
+        
+        <section id="viewHome" class="tela-inicial hidden">
+            <div class="categoria-flutuante" id="cat-catalogo" onclick="navegarPara('catalogo', 'Todos')">CATÁLOGO</div>
+            <div class="categoria-flutuante" id="cat-generos" onclick="navegarPara('generos')">GÊNEROS</div>
+            <div class="categoria-flutuante" id="cat-filmes" onclick="navegarPara('catalogo', 'Filme')">FILMES</div>
+            
+            <img class="borboleta-imagem" src="borboleta.jpg" alt="Butterfly Graphic">
 
-    <div id="grid" class="grid grid-cols-3 gap-4 md:gap-8 max-w-4xl mx-auto pb-10"></div>
+            <div class="categoria-flutuante" id="cat-series" onclick="navegarPara('catalogo', 'Série')">SÉRIES</div>
+            <div class="categoria-flutuante" id="cat-animes" onclick="navegarPara('catalogo', 'Anime')">ANIMES</div>
+            <div class="categoria-flutuante" id="cat-animacoes" onclick="navegarPara('catalogo', 'Animação')">ANIMAÇÕES</div>
+            <div class="categoria-flutuante" id="cat-doramas" onclick="navegarPara('catalogo', 'Dorama')">DORAMAS</div>
+            <div class="categoria-flutuante" id="cat-livros" onclick="navegarPara('catalogo', 'Livro')">LIVROS</div>
+        </section>
 
-    <div id="modal" onclick="fecharModalManual()">
-        <div onclick="event.stopPropagation()" class="bg-[#1a1a24] md:bg-[#252535] p-6 md:p-10 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scroll relative shadow-2xl">
-            <button onclick="fecharModalManual()" class="absolute top-4 right-5 text-gray-400 hover:text-white text-2xl">✕</button>
-            <div id="modalContent"></div>
+        <section id="viewCatalogo" class="hidden">
+            <div class="titulo-aba" id="tituloAbaCatalogo">CATÁLOGO <span></span></div>
+            <div class="grid-catalogo" id="gridObras"></div>
+        </section>
+
+        <section id="viewGeneros" class="hidden">
+            <div class="titulo-aba" id="tituloAbaGeneros">GÊNEROS <span></span></div>
+            <div class="grid-generos" id="listaGenerosContainer"></div>
+        </section>
+
+    </main>
+
+    <div id="modalObra" class="modal-overlay hidden">
+        <div class="modal-conteudo">
+            <div class="botao-fechar-modal" onclick="fecharModalPeloBotao()">X</div>
+            
+            <div id="wrapperPlayerVideo" class="wrapper-player-video hidden">
+                <iframe id="iframePlayerVideo" class="iframe-player" src="" allowfullscreen></iframe>
+            </div>
+
+            <div id="modalConteudoDinamico"></div>
+            
+            <div class="container-comentarios-modal">
+                <div class="titulo-comentarios">Discussão da Obra</div>
+                <div id="disqus_thread">
+                    <div style="text-align: center; font-size: 10px; color: var(--texto-mutado); border: 1px dashed var(--linha-fina); padding: 20px;">
+                        Comentários em breve...
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <footer id="footerTexto" class="hidden">
+        projeto pensado com o objetivo de facilitar o acesso a obras <3
+    </footer>
+
     <script>
-        const LINK_CATALOGO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=1306030388&single=true&output=csv"; 
-        const LINK_EPISODIOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=2112766704&single=true&output=csv"; 
-        const LINK_COMENTARIOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=40184193&single=true&output=csv"; 
+        // ==========================================================================
+        // CÉREBRO: BANCO DE DADOS DINÂMICO (Via Google Sheets)
+        // ==========================================================================
+        const URL_CATALOGO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=1518895542&single=true&output=csv";
+        const URL_LINKS_UNICOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=1143473702&single=true&output=csv";
+        const URL_EPISODIOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=91909291&single=true&output=csv";
 
-        const API_COMENTARIOS = "https://script.google.com/macros/s/AKfycbzmVNHQcgfjIF4MLp__HoxAfirlsE3dAhH4vg5pd_o_awhW5LZhehFwwVCni4WcuQuN/exec";
+        let bancoDadosObras = [];
+        let bancoLinksUnicos = {};
+        let bancoEpisodios = {};
 
-        let appData = { catalogo: [], episodios: [], comentarios: [] };
-        const tipos = ['Tudo', 'Filme', 'Anime', 'Dorama', 'Série', 'Livros', 'Mangás', 'Documentário', 'Reality'];
+        const separatorASCII = `.:::.        .:::.
+::::::.      .::::::
+::::::::    ::::::::
+ ::::::::  ::::::::
+  :::::: :: ::::::
+   :::: :::: ::::
+     :: :::: ::
+        ::::
+        ::::
+        ::::
+         ::`;
 
-        Promise.all([
-            new Promise(resolve => Papa.parse(LINK_CATALOGO, { download: true, complete: resolve })),
-            new Promise(resolve => Papa.parse(LINK_EPISODIOS, { download: true, complete: resolve })),
-            new Promise(resolve => Papa.parse(LINK_COMENTARIOS, { download: true, complete: resolve }))
-        ]).then(results => {
-            document.getElementById('loading').style.display = 'none';
-            appData.catalogo = results[0].data.slice(1).filter(r => r.length > 5);
-            appData.episodios = results[1].data.slice(1).filter(r => r.length > 5);
-            appData.comentarios = results[2].data.slice(1).filter(r => r.length >= 2);
+        // ==========================================================================
+        // INICIALIZAÇÃO ASSÍNCRONA E NAVEGAÇÃO
+        // ==========================================================================
+        window.addEventListener('load', async () => {
+            history.replaceState({ navegação: 'home' }, '');
             
-            render(appData.catalogo);
-            setupTabs();
-        }).catch(error => {
-            document.getElementById('loading').innerHTML = "Erro ao carregar! Verifique os links CSV.";
-            document.getElementById('loading').style.color = "red";
+            // 1. Inicia o Transplante de Cérebro (Baixa os dados)
+            await carregarBancoDeDados();
+            
+            // 2. Acorda as funções do site
+            configurarBuscador();
+            
+            // 3. Libera a visualização
+            document.getElementById("viewHome").classList.remove("hidden");
+            document.getElementById("footerTexto").classList.remove("hidden");
+            atualizarContadorObrasGeral(bancoDadosObras.length);
         });
 
-        const clean = (str) => str ? str.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+        async function carregarBancoDeDados() {
+            try {
+                // Dispara o download das 3 abas ao mesmo tempo para ser super rápido
+                const [resCat, resLinks, resEps] = await Promise.all([
+                    fetch(URL_CATALOGO).then(r => r.text()),
+                    fetch(URL_LINKS_UNICOS).then(r => r.text()),
+                    fetch(URL_EPISODIOS).then(r => r.text())
+                ]);
 
-        function render(list, filter = 'Tudo') {
-            const grid = document.getElementById('grid');
-            const filtered = (filter === 'Tudo') ? list : list.filter(r => 
-                clean(r[2]).includes(clean(filter)) || clean(filter).includes(clean(r[2])) || clean(r[3]).includes(clean(filter))
-            );
+                // Configura o conversor para entender a planilha
+                const configPapa = { 
+                    header: true, 
+                    skipEmptyLines: true, 
+                    transformHeader: h => h.trim() 
+                };
+                
+                // Popula as Obras
+                bancoDadosObras = Papa.parse(resCat, configPapa).data;
+                
+                // Popula e organiza os Links Únicos
+                const arrLinks = Papa.parse(resLinks, configPapa).data;
+                arrLinks.forEach(l => { 
+                    bancoLinksUnicos[l.id_obra] = l; 
+                });
 
-            grid.innerHTML = filtered.map((r, i) => `
-                <div class="poster-hover" onclick="abrirModal(${appData.catalogo.indexOf(r)})">
-                    <img src="${r[14]}" class="rounded-xl w-full aspect-[2/3] object-cover shadow-lg" onerror="this.src='https://via.placeholder.com/200x300/252535/ffffff?text=Sem+Capa'">
-                </div>`).join('');
+                // Popula e agrupa os Episódios
+                const arrEps = Papa.parse(resEps, configPapa).data;
+                arrEps.forEach(ep => {
+                    if (!bancoEpisodios[ep.id_obra]) {
+                        bancoEpisodios[ep.id_obra] = [];
+                    }
+                    bancoEpisodios[ep.id_obra].push(ep);
+                });
+
+            } catch (erro) {
+                console.error("Erro fatal ao sincronizar:", erro);
+                document.getElementById("subtextoDinamicoBusca").textContent = "ERRO DE CONEXÃO COM A PLANILHA.";
+            }
         }
 
-        function setupTabs() {
-            document.getElementById('tabs').innerHTML = tipos.map(t => 
-                `<button onclick="document.getElementById('search').value=''; render(appData.catalogo, '${t}')" class="px-5 py-1 rounded-full bg-[#252535] text-xs hover:bg-gray-600 transition">${t}</button>`).join('');
-        }
-
-        document.getElementById('search').oninput = (e) => {
-            const v = clean(e.target.value);
-            render(appData.catalogo.filter(r => clean(r.join(" ")).includes(v)));
-        };
-
-        function abrirModal(index) {
-            const r = appData.catalogo[index];
-            const isSerie = clean(r[2]).includes('serie') || clean(r[2]).includes('dorama') || clean(r[2]).includes('anime');
-            const isLivro = clean(r[2]).includes('livro') || clean(r[2]).includes('manga');
-            const eps = appData.episodios.filter(e => e[0] === r[0]);
-            const comments = appData.comentarios.filter(c => clean(c[0]) === clean(r[0]));
-
-            let generosHTML = `<span class="px-4 py-1 bg-[#3a3a4c] rounded-full text-[11px] font-bold text-white mr-1">${r[2] || 'Obra'}</span>`;
-            if (r[3]) {
-                generosHTML += r[3].split(',').map(g => g.trim()).map(g => 
-                    `<button onclick="filtrarPeloModal('${g}')" class="px-4 py-1 bg-[#252535] border border-gray-600 rounded-full text-[11px] hover:bg-[#3a3a4c] transition">${g}</button>`
-                ).join(' ');
+        window.addEventListener('popstate', (event) => {
+            if (!event.state) {
+                renderizarVisualHome();
+                fecharModalVisual();
+                return;
             }
 
-            let acoesHTML = '';
-            if (isLivro) {
-                acoesHTML = `
-                    <p class="text-xs text-gray-400 mb-3">${r[10] || 'Editora'} | ${r[9] || 'Idioma'}</p>
-                    <div class="flex items-center gap-4 mb-3">
-                        <button class="bg-[#3a3a4c] px-10 py-2 rounded-full text-xs font-bold hover:bg-gray-600 transition">Ler</button>
+            const estado = event.state.navegação;
+            
+            if (estado === 'home') {
+                renderizarVisualHome();
+                fecharModalVisual();
+            } else if (estado === 'catalogo') {
+                renderizarVisualCatalogo(event.state.parametro);
+                fecharModalVisual();
+            } else if (estado === 'generos') {
+                renderizarVisualGeneros();
+                fecharModalVisual();
+            } else if (estado === 'modal') {
+                abrirModalVisual(event.state.id_obra, false); 
+            }
+        });
+
+        function navegarPara(destino, parametro = null) {
+            if (destino === 'home') {
+                history.pushState({ navegação: 'home' }, '');
+                renderizarVisualHome();
+            } else if (destino === 'catalogo') {
+                history.pushState({ navegação: 'catalogo', parametro: parametro }, '');
+                renderizarVisualCatalogo(parametro);
+            } else if (destino === 'generos') {
+                history.pushState({ navegação: 'generos' }, '');
+                renderizarVisualGeneros();
+            }
+        }
+
+        // ==========================================================================
+        // RENDERIZAÇÃO DAS TELAS
+        // ==========================================================================
+        function atualizarContadorObrasGeral(total) {
+            document.getElementById("subtextoDinamicoBusca").textContent = `${total} OBRAS AO TOTAL...`;
+        }
+
+        function renderizarVisualHome() {
+            document.getElementById("viewHome").classList.remove("hidden");
+            document.getElementById("viewCatalogo").classList.add("hidden");
+            document.getElementById("viewGeneros").classList.add("hidden");
+            document.getElementById("footerTexto").classList.remove("hidden");
+            document.getElementById("areaBusca").classList.remove("hidden");
+            document.getElementById("subtextoDinamicoBusca").classList.remove("hidden");
+            document.getElementById("campoPesquisa").value = "";
+            atualizarContadorObrasGeral(bancoDadosObras.length);
+        }
+
+        function renderizarVisualCatalogo(cat) {
+            document.getElementById("viewHome").classList.add("hidden");
+            document.getElementById("viewCatalogo").classList.remove("hidden");
+            document.getElementById("viewGeneros").classList.add("hidden");
+            document.getElementById("footerTexto").classList.add("hidden");
+            document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
+
+            let filtradas = cat === 'Todos' ? [...bancoDadosObras] : bancoDadosObras.filter(o => (o.categoria || "").toLowerCase() === cat.toLowerCase());
+            
+            filtradas.sort((a, b) => {
+                let dataA = a.data_adicao || "01/01/2000";
+                let dataB = b.data_adicao || "01/01/2000";
+                let partesA = dataA.split('/');
+                let partesB = dataB.split('/');
+                return new Date(partesB[2], partesB[1] - 1, partesB[0]) - new Date(partesA[2], partesA[1] - 1, partesA[0]);
+            });
+
+            document.getElementById("tituloAbaCatalogo").innerHTML = `${cat.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
+            renderizarGridObras(filtradas);
+        }
+
+        function renderizarVisualGeneros() {
+            document.getElementById("viewHome").classList.add("hidden");
+            document.getElementById("viewCatalogo").classList.add("hidden");
+            document.getElementById("viewGeneros").classList.remove("hidden");
+            document.getElementById("footerTexto").classList.add("hidden");
+            document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
+            
+            renderizarListaGeneros();
+        }
+
+        function configurarBuscador() {
+            const input = document.getElementById("campoPesquisa");
+            input.addEventListener("input", (e) => {
+                let termo = e.target.value.toLowerCase().trim();
+                
+                if(termo === "") { 
+                    navegarPara('home'); 
+                    return; 
+                }
+                
+                document.getElementById("viewHome").classList.add("hidden");
+                document.getElementById("viewCatalogo").classList.remove("hidden");
+                document.getElementById("viewGeneros").classList.add("hidden");
+                document.getElementById("footerTexto").classList.add("hidden");
+                document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
+                
+                let achados = bancoDadosObras.filter(o => {
+                    let titulo = (o.titulo_principal || "").toLowerCase();
+                    let alt = (o.titulos_alternativos || "").toLowerCase();
+                    let dir = (o.diretor_autor || "").toLowerCase();
+                    let gen = (o.generos || "").toLowerCase();
+                    let ano = (o.ano || "").toString().toLowerCase();
+                    let cat = (o.categoria || "").toLowerCase();
+                    let pais = (o.pais || "").toLowerCase();
+
+                    return titulo.includes(termo) || alt.includes(termo) || dir.includes(termo) || 
+                           gen.includes(termo) || ano.includes(termo) || cat.includes(termo) || pais.includes(termo);
+                });
+                
+                document.getElementById("tituloAbaCatalogo").innerHTML = `BUSCA <span>${achados.length} OBRAS</span>`;
+                renderizarGridObras(achados);
+            });
+        }
+
+        function renderizarGridObras(obras) {
+            const grid = document.getElementById("gridObras");
+            grid.innerHTML = "";
+            obras.forEach(obra => {
+                const item = document.createElement("div");
+                item.className = `item-obra ${obra.status_link === 'OFF' ? 'status-off' : ''}`;
+                item.onclick = () => abrirModalObra(obra.id_obra);
+                item.innerHTML = `<img class="poster-imagem" src="${obra.capa_vertical}" alt="${obra.titulo_principal}">`;
+                grid.appendChild(item);
+            });
+        }
+
+        function renderizarListaGeneros() {
+            const container = document.getElementById("listaGenerosContainer");
+            container.innerHTML = "";
+            let mapaGeneros = {};
+            bancoDadosObras.forEach(obra => {
+                let generos = obra.generos || "";
+                generos.split(",").forEach(g => {
+                    let nome = g.trim();
+                    if(nome) mapaGeneros[nome] = (mapaGeneros[nome] || 0) + 1;
+                });
+            });
+            let arr = Object.keys(mapaGeneros).map(k => ({nome: k, qtd: mapaGeneros[k]}));
+            
+            arr.sort((a,b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome));
+            
+            document.getElementById("tituloAbaGeneros").innerHTML = `GÊNEROS <span>${arr.length}</span>`;
+            arr.forEach(gen => {
+                container.innerHTML += `<div class="linha-genero" onclick="fecharAbaGenerosERunSearch('${gen.nome}')">${gen.nome} <span>${gen.qtd}</span></div>`;
+            });
+        }
+
+        function fecharAbaGenerosERunSearch(nomeG) {
+            history.pushState({ navegação: 'catalogo', parametro: nomeG }, '');
+            document.getElementById("viewHome").classList.add("hidden");
+            document.getElementById("viewCatalogo").classList.remove("hidden");
+            document.getElementById("viewGeneros").classList.add("hidden");
+            document.getElementById("footerTexto").classList.add("hidden");
+            document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
+            
+            let filtradas = bancoDadosObras.filter(o => (o.generos || "").toLowerCase().includes(nomeG.toLowerCase()));
+            
+            filtradas.sort((a, b) => {
+                let dataA = a.data_adicao || "01/01/2000";
+                let dataB = b.data_adicao || "01/01/2000";
+                let partesA = dataA.split('/');
+                let partesB = dataB.split('/');
+                return new Date(partesB[2], partesB[1] - 1, partesB[0]) - new Date(partesA[2], partesA[1] - 1, partesA[0]);
+            });
+
+            document.getElementById("tituloAbaCatalogo").innerHTML = `GÊNERO: ${nomeG.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
+            renderizarGridObras(filtradas);
+        }
+
+        function abrirModalObra(id) {
+            history.pushState({ navegação: 'modal', id_obra: id }, '');
+            abrirModalVisual(id, true);
+        }
+
+        function fecharModalPeloBotao() {
+            history.back();
+        }
+
+        function fecharModalVisual() {
+            document.getElementById("modalObra").classList.add("hidden");
+            document.body.style.overflow = "auto";
+            fecharMiniCinema();
+        }
+
+        function abrirModalVisual(id, darResetCinema = true) {
+            const obra = bancoDadosObras.find(o => o.id_obra === id);
+            if(!obra) return;
+            
+            if(darResetCinema) fecharMiniCinema();
+
+            const cat = (obra.categoria || "").toLowerCase();
+            let html = "";
+            let corBadge = obterCorClassificacao(obra.classificacao_etaria || "");
+
+            let sinopseHtml = `<div class="sinopse-modal">${obra.sinopse || ""}</div>`;
+            let tagsHtml = `<div class="container-tags-generos">${gerarTagsHtml(obra)}</div>`;
+            
+            let altTitulos = (obra.titulos_alternativos || "").replace(/\\n/g, '<br>');
+            let outrosTitulosHtml = altTitulos ? `<div class="bloco-outros-titulos"><div class="label-outros-titulos">Outros títulos:</div><div class="conteudo-outros-titulos">${altTitulos}</div></div>` : "";
+
+            // Obras sem duracao ou info extra tratadas graciosamente
+            let duracao = obra.duracao_paginas ? ` | ${obra.duracao_paginas}` : "";
+            let infoExtra = obra.info_extra ? `<div class="linha-tecnica">${obra.info_extra}</div>` : "";
+
+            if (cat === 'livro') {
+                let link = bancoLinksUnicos[id] || {};
+                html = `
+                <div class="header-modal-livro">
+                    <div class="info-bloco-esquerda">
+                        <div class="titulo-obra-modal">${obra.titulo_principal || "Sem Título"}</div>
+                        <div class="autor-diretor-modal">por ${obra.diretor_autor || "?"}</div>
+                        <div class="linha-tecnica">
+                            <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}</span>
+                        </div>
+                        ${infoExtra}
+                        ${tagsHtml}
+                        ${outrosTitulosHtml}
                     </div>
-                    <div class="flex gap-3">
-                        <a href="${r[16]}" target="_blank" class="
+                    <img class="capa-livro-modal" src="${obra.capa_vertical}" alt="${obra.titulo_principal}">
+                </div>
+                ${sinopseHtml}
+                <div class="bloco-links-livro">
+                    <div class="borboleta-mini-area">
+                        <pre style="font-family:monospace; font-size:3px; line-height:1; color:#000;">${separatorASCII}</pre>
+                    </div>
+                    <div class="links-livro-col">
+                        <a class="link-livro" href="${link.link_epub || "#"}" target="_blank">epub</a>
+                        <a class="link-livro" href="${link.link_pdf || "#"}" target="_blank">pdf</a>
+                        <a class="link-livro" href="${link.link_ler_online || "#"}" target="_blank">ler<br>online</a>
+                    </div>
+                </div>
+                `;
+            } else if (cat === 'filme' || cat === 'animação') {
+                let link = bancoLinksUnicos[id] || {};
+                let vistos = { leg: verificarSeFoiVisto(`filme_${id}_leg`), dub: verificarSeFoiVisto(`filme_${id}_dub`) };
+
+                html = `
+                <div class="header-modal-filme">
+                    <img class="banner-obra-modal" src="${obra.banner_horizontal || obra.capa_vertical}" alt="${obra.titulo_principal}" id="modalImagemFicha">
+                    <div class="titulo-obra-modal">${obra.titulo_principal}</div>
+                    <div class="autor-diretor-modal">por ${obra.diretor_autor || "?"}</div>
+                    <div class="linha-tecnica">
+                        <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}${duracao}</span>
+                    </div>
+                    ${tagsHtml}
+                    ${outrosTitulosHtml}
+                </div>
+                ${sinopseHtml}
+                <div class="bloco-links-filme">
+                    <span class="link-streaming ${vistos.leg?'visto':''}" onclick="dispararMiniCinema('${link.link_legendado}', this, 'filme_${id}_leg')">Legendado</span>
+                    <div class="borboleta-mini-area">
+                        <pre style="font-family:monospace; font-size:3px; line-height:1; color:#000;">${separatorASCII}</pre>
+                    </div>
+                    <span class="link-streaming ${vistos.dub?'visto':''}" onclick="dispararMiniCinema('${link.link_dublado}', this, 'filme_${id}_dub')">Dublado</span>
+                </div>
+                <div class="bloco-legendas">
+                    <div class="label-legendas">Legendas disponíveis</div>
+                    <div style="color:var(--texto-mutado); white-space:pre-wrap;">${link.legendas_disponiveis || "Não Informada."}</div>
+                </div>
+                `;
+            } else {
+                let eps = bancoEpisodios[id] || [];
+                let infoEps = obra.info_extra ? ` | ${obra.info_extra}` : "";
+                
+                html = `
+                <div class="header-modal-filme">
+                    <img class="banner-obra-modal" src="${obra.banner_horizontal || obra.capa_vertical}" alt="${obra.titulo_principal}" id="modalImagemFicha">
+                    <div class="titulo-obra-modal">${obra.titulo_principal}</div>
+                    <div class="autor-diretor-modal">por ${obra.diretor_autor || "?"}</div>
+                    <div class="linha-tecnica">
+                        <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}${infoEps}</span>
+                    </div>
+                    ${tagsHtml}
+                    ${outrosTitulosHtml}
+                </div>
+                ${sinopseHtml}
+                
+                <div class="container-temporadas">
+                    <div class="titulo-temporada-gatilho">
+                        Temporada 1
+                        <div style="font-family:monospace; font-size:3px; line-height:1; color:#000;">
+.:::.        .:::.
+::::::.      .::::::
+::::::::    ::::::::
+ ::::::::  ::::::::
+  :::::: :: ::::::
+   :::: :::: ::::
+     :: :::: ::
+        ::::
+        ::::
+        ::::
+         ::
+                        </div>
+                    </div>
+                    <div class="lista-episodios">
+                `;
+                
+                eps.forEach(ep => {
+                    let kLeg = `serie_${id}_t${ep.temporada_numero}_ep${ep.episodio_numero}_leg`;
+                    let kDub = `serie_${id}_t${ep.temporada_numero}_ep${ep.episodio_numero}_dub`;
+                    let vistos = { leg: verificarSeFoiVisto(kLeg), dub: verificarSeFoiVisto(kDub) };
+
+                    html += `
+                    <div class="item-episodio">
+                        <div class="ep-info-esquerda">
+                            <div class="ep-titulo-linha"><span class="ep-num">EP.${ep.episodio_numero} |</span> ${ep.titulo_episodio || "Episódio"}</div>
+                            <div class="ep-sinopse">${ep.sinopse_episodio || ""}</div>
+                        </div>
+                        <div class="ep-links-direita">
+                            <span class="ep-duracao">${ep.duracao_episodio || ""}</span>
+                            <span class="ep-link-btn ${vistos.leg?'visto':''}" onclick="dispararMiniCinema('${ep.link_legendado}', this, '${kLeg}')">Legendado</span>
+                            <span class="ep-link-btn ${vistos.dub?'visto':''}" onclick="dispararMiniCinema('${ep.link_dublado}', this, '${kDub}')">Dublado</span>
+                        </div>
+                    </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            }
+
+            document.getElementById("modalConteudoDinamico").innerHTML = html;
+            document.getElementById("modalObra").classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+        }
+
+        function dispararMiniCinema(url, elClick, storageKey) {
+            if(!url || url==='#' || url==="" || url==="undefined") return;
+            marcarComoVisto(elClick, storageKey);
+            const w = document.getElementById("wrapperPlayerVideo");
+            const i = document.getElementById("iframePlayerVideo");
+            const img = document.getElementById("modalImagemFicha");
+            i.src = url;
+            w.classList.remove("hidden");
+            if(img) img.classList.add("hidden");
+            w.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+
+        function fecharMiniCinema() {
+            const w = document.getElementById("wrapperPlayerVideo");
+            const i = document.getElementById("iframePlayerVideo");
+            const img = document.getElementById("modalImagemFicha");
+            if(i) i.src = "";
+            if(w) w.classList.add("hidden");
+            if(img) img.classList.remove("hidden");
+        }
+
+        function marcarComoVisto(el, key) {
+            if(!el) return;
+            el.classList.add("visto");
+            localStorage.setItem(key, "true");
+        }
+
+        function verificarSeFoiVisto(key) { return localStorage.getItem(key) === "true"; }
+
+        function obterCorClassificacao(c) {
+            c = c.toString().toLowerCase().trim();
+            if(c === 'livre') return 'var(--cl-livre)';
+            if(c === '10') return 'var(--cl-10)';
+            if(c === '12') return 'var(--cl-12)';
+            if(c === '14') return 'var(--cl-14)';
+            if(c === '16') return 'var(--cl-16)';
+            if(c === '18') return 'var(--cl-18)';
+            return '#000';
+        }
+
+        function gerarTagsHtml(obra) {
+            let cat = obra.categoria || "Obra";
+            let html = `<span class="tag-modal bold" onclick="fecharModalVisual(); navegarPara('catalogo', '${cat}')">${cat}</span> `;
+            let generos = obra.generos || "";
+            generos.split(",").forEach(g => { 
+                let gen = g.trim();
+                if(gen) {
+                    html += `<span class="tag-modal" onclick="fecharModalVisual(); fecharAbaGenerosERunSearch('${gen}')">${gen}</span> `; 
+                }
+            });
+            return html;
+        }
+    </script>
+</body>
+</html>
