@@ -48,6 +48,42 @@
         .hidden { display: none !important; }
 
         /* ==========================================================================
+           ANIMAÇÕES E SUAVIZAÇÃO DE INTERFACES (SMOOTHNESS)
+           ========================================================================== */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Aplica animação sempre que uma seção perde a classe .hidden */
+        section:not(.hidden), .modal-overlay:not(.hidden) {
+            animation: fadeSlideUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        /* Efeitos de Levitar e Interação (Hover / Active) */
+        .categoria-flutuante, .tag-modal, .linha-genero, .link-streaming, .link-livro, .ep-link-btn, .logo-site {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .categoria-flutuante:hover, .tag-modal:hover, .link-streaming:hover, .link-livro:hover, .ep-link-btn:hover {
+            transform: translateY(-2px);
+            color: #444444;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+
+        .linha-genero:hover {
+            transform: translateX(4px);
+            color: var(--texto-escuro);
+        }
+
+        .categoria-flutuante:active, .tag-modal:active, .link-streaming:active, .link-livro:active, .ep-link-btn:active, .item-obra:active {
+            transform: translateY(1px) scale(0.97);
+            opacity: 0.8;
+        }
+
+        .logo-site:active { transform: scaleY(1.1) scale(0.95); }
+
+        /* ==========================================================================
            CABEÇALHO GLOBAL
            ========================================================================== */
         header {
@@ -87,6 +123,11 @@
             display: flex;
             align-items: center;
             padding: 8px 12px;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .wrapper-input:focus-within {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .icone-busca {
@@ -112,6 +153,7 @@
             margin-top: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            transition: opacity 0.3s ease;
         }
 
         /* ==========================================================================
@@ -130,6 +172,13 @@
             max-width: 150px;
             pointer-events: none;
             user-select: none;
+            animation: float 6s ease-in-out infinite; /* Sutil flutuação na borboleta */
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
         }
 
         .categoria-flutuante {
@@ -139,7 +188,8 @@
             cursor: pointer;
             letter-spacing: 1px;
             background: rgba(255,255,255,0.8);
-            padding: 2px 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
             z-index: 10;
         }
         .categoria-flutuante:hover { font-weight: bold; }
@@ -200,13 +250,19 @@
             overflow: hidden;
             background-color: #f0f0f0;
             position: relative;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+        }
+
+        .item-obra:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
         .poster-imagem {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: filter 0.3s ease;
+            transition: filter 0.3s ease, transform 0.5s ease;
         }
 
         .item-obra.status-off .poster-imagem { filter: grayscale(100%) brightness(40%); }
@@ -242,7 +298,6 @@
             color: var(--texto-mutado);
         }
         
-        .linha-genero:hover { color: var(--texto-escuro); font-weight: bold; }
         .linha-genero span { color: var(--texto-escuro); margin-left: 5px; }
 
         /* ==========================================================================
@@ -264,7 +319,9 @@
             font-weight: 300;
             cursor: pointer;
             margin-bottom: 15px;
+            transition: opacity 0.2s ease;
         }
+        .botao-fechar-modal:active { opacity: 0.5; }
 
         .header-modal-filme { display: block; }
         .banner-obra-modal {
@@ -329,8 +386,7 @@
             font-size: 11px;
             margin-bottom: 15px;
         }
-        .tag-modal { text-decoration: underline; margin-right: 8px; cursor: pointer; transition: font-weight 0.2s ease;}
-        .tag-modal:hover { font-weight: bold; }
+        .tag-modal { text-decoration: underline; margin-right: 8px; cursor: pointer; display: inline-block; }
         .tag-modal.bold { font-weight: bold; }
 
         .bloco-outros-titulos { margin-bottom: 20px; }
@@ -350,8 +406,8 @@
             align-items: center;
             margin-bottom: 30px;
         }
-        .link-streaming { font-size: 14px; font-weight: bold; text-decoration: underline; cursor: pointer; }
-        .link-streaming.visto { color: #ccc !important; }
+        .link-streaming { font-size: 14px; font-weight: bold; text-decoration: underline; cursor: pointer; display: inline-block;}
+        .link-streaming.visto { color: #ccc !important; text-decoration: none; }
 
         .bloco-legendas { font-size: 10px; }
         .label-legendas { font-family: var(--font-titulo); font-size: 16px; margin-bottom: 5px; }
@@ -368,7 +424,7 @@
             gap: 20px;
             text-align: center;
         }
-        .link-livro { font-size: 16px; font-weight: bold; text-decoration: underline; cursor: pointer; }
+        .link-livro { font-size: 16px; font-weight: bold; text-decoration: underline; cursor: pointer; display: inline-block;}
 
         .titulo-temporada-gatilho {
             font-family: var(--font-titulo);
@@ -415,7 +471,7 @@
             margin-bottom: 8px;
             cursor: pointer;
         }
-        .ep-link-btn.visto { color: #ccc !important; }
+        .ep-link-btn.visto { color: #ccc !important; text-decoration: none; }
 
         .wrapper-player-video {
             width: 100%;
@@ -424,6 +480,7 @@
             border-radius: 8px;
             overflow: hidden;
             margin-bottom: 15px;
+            transition: all 0.4s ease;
         }
         .iframe-player { width: 100%; height: 100%; border: none; }
 
@@ -524,10 +581,14 @@
         ::::
          ::`;
 
+        // ==========================================================================
+        // INICIALIZAÇÃO ASSÍNCRONA E NAVEGAÇÃO SEGURA
+        // ==========================================================================
         window.addEventListener('load', async () => {
             history.replaceState({ navegação: 'home' }, '');
             await carregarBancoDeDados();
-            configurarBuscador();
+            configurarBuscadorOtimizado();
+            
             document.getElementById("viewHome").classList.remove("hidden");
             document.getElementById("footerTexto").classList.remove("hidden");
             atualizarContadorObrasGeral(bancoDadosObras.length);
@@ -558,28 +619,34 @@
             }
         }
 
+        // CONSERTO DEFINITIVO DO BOTÃO VOLTAR DO CELULAR
         window.addEventListener('popstate', (event) => {
+            // Regra de Ouro: Sempre destravar o scroll quando usar o botão voltar
+            document.body.style.overflow = "auto";
+            fecharMiniCinema();
+
             if (!event.state) {
                 renderizarVisualHome();
-                fecharModalVisual();
+                document.getElementById("modalObra").classList.add("hidden");
                 return;
             }
             const estado = event.state.navegação;
             if (estado === 'home') {
                 renderizarVisualHome();
-                fecharModalVisual();
+                document.getElementById("modalObra").classList.add("hidden");
             } else if (estado === 'catalogo') {
                 renderizarVisualCatalogo(event.state.parametro);
-                fecharModalVisual();
+                document.getElementById("modalObra").classList.add("hidden");
             } else if (estado === 'generos') {
                 renderizarVisualGeneros();
-                fecharModalVisual();
+                document.getElementById("modalObra").classList.add("hidden");
             } else if (estado === 'modal') {
                 abrirModalVisual(event.state.id_obra, false); 
             }
         });
 
         function navegarPara(destino, parametro = null) {
+            document.body.style.overflow = "auto"; // Garante limpeza
             if (destino === 'home') {
                 history.pushState({ navegação: 'home' }, '');
                 renderizarVisualHome();
@@ -592,14 +659,28 @@
             }
         }
 
+        // ==========================================================================
+        // RENDERIZAÇÃO DAS TELAS E ANIMAÇÕES
+        // ==========================================================================
         function atualizarContadorObrasGeral(total) {
             document.getElementById("subtextoDinamicoBusca").textContent = `${total} OBRAS AO TOTAL...`;
         }
 
+        function retriggerAnimation(elementId) {
+            const el = document.getElementById(elementId);
+            el.style.animation = 'none';
+            el.offsetHeight; // trigger reflow
+            el.style.animation = null; 
+        }
+
         function renderizarVisualHome() {
-            document.getElementById("viewHome").classList.remove("hidden");
             document.getElementById("viewCatalogo").classList.add("hidden");
             document.getElementById("viewGeneros").classList.add("hidden");
+            
+            const home = document.getElementById("viewHome");
+            home.classList.remove("hidden");
+            retriggerAnimation("viewHome");
+
             document.getElementById("footerTexto").classList.remove("hidden");
             document.getElementById("areaBusca").classList.remove("hidden");
             document.getElementById("subtextoDinamicoBusca").classList.remove("hidden");
@@ -609,8 +690,12 @@
 
         function renderizarVisualCatalogo(cat) {
             document.getElementById("viewHome").classList.add("hidden");
-            document.getElementById("viewCatalogo").classList.remove("hidden");
             document.getElementById("viewGeneros").classList.add("hidden");
+            
+            const catalogo = document.getElementById("viewCatalogo");
+            catalogo.classList.remove("hidden");
+            retriggerAnimation("viewCatalogo");
+
             document.getElementById("footerTexto").classList.add("hidden");
             document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
 
@@ -630,39 +715,57 @@
         function renderizarVisualGeneros() {
             document.getElementById("viewHome").classList.add("hidden");
             document.getElementById("viewCatalogo").classList.add("hidden");
-            document.getElementById("viewGeneros").classList.remove("hidden");
+            
+            const generos = document.getElementById("viewGeneros");
+            generos.classList.remove("hidden");
+            retriggerAnimation("viewGeneros");
+
             document.getElementById("footerTexto").classList.add("hidden");
             document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
             renderizarListaGeneros();
         }
 
-        function configurarBuscador() {
+        // ==========================================================================
+        // MOTOR DE BUSCA OTIMIZADO (ANTI-LAG - DEBOUNCE)
+        // ==========================================================================
+        function configurarBuscadorOtimizado() {
             const input = document.getElementById("campoPesquisa");
+            let timeoutBusca;
+
             input.addEventListener("input", (e) => {
                 let termo = e.target.value.toLowerCase().trim();
-                if(termo === "") { navegarPara('home'); return; }
                 
-                document.getElementById("viewHome").classList.add("hidden");
-                document.getElementById("viewCatalogo").classList.remove("hidden");
-                document.getElementById("viewGeneros").classList.add("hidden");
-                document.getElementById("footerTexto").classList.add("hidden");
-                document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
+                clearTimeout(timeoutBusca); // Cancela a busca anterior se digitar rápido
                 
-                let achados = bancoDadosObras.filter(o => {
-                    let titulo = (o.titulo_principal || "").toLowerCase();
-                    let alt = (o.titulos_alternativos || "").toLowerCase();
-                    let dir = (o.diretor_autor || "").toLowerCase();
-                    let gen = (o.generos || "").toLowerCase();
-                    let ano = (o.ano || "").toString().toLowerCase();
-                    let cat = (o.categoria || "").toLowerCase();
-                    let pais = (o.pais || "").toLowerCase();
+                timeoutBusca = setTimeout(() => {
+                    if(termo === "") { navegarPara('home'); return; }
+                    
+                    document.getElementById("viewHome").classList.add("hidden");
+                    document.getElementById("viewGeneros").classList.add("hidden");
+                    
+                    const catalogo = document.getElementById("viewCatalogo");
+                    catalogo.classList.remove("hidden");
+                    retriggerAnimation("viewCatalogo");
 
-                    return titulo.includes(termo) || alt.includes(termo) || dir.includes(termo) || 
-                           gen.includes(termo) || ano.includes(termo) || cat.includes(termo) || pais.includes(termo);
-                });
-                
-                document.getElementById("tituloAbaCatalogo").innerHTML = `BUSCA <span>${achados.length} OBRAS</span>`;
-                renderizarGridObras(achados);
+                    document.getElementById("footerTexto").classList.add("hidden");
+                    document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
+                    
+                    let achados = bancoDadosObras.filter(o => {
+                        let titulo = (o.titulo_principal || "").toLowerCase();
+                        let alt = (o.titulos_alternativos || "").toLowerCase();
+                        let dir = (o.diretor_autor || "").toLowerCase();
+                        let gen = (o.generos || "").toLowerCase();
+                        let ano = (o.ano || "").toString().toLowerCase();
+                        let cat = (o.categoria || "").toLowerCase();
+                        let pais = (o.pais || "").toLowerCase();
+
+                        return titulo.includes(termo) || alt.includes(termo) || dir.includes(termo) || 
+                               gen.includes(termo) || ano.includes(termo) || cat.includes(termo) || pais.includes(termo);
+                    });
+                    
+                    document.getElementById("tituloAbaCatalogo").innerHTML = `BUSCA <span>${achados.length} OBRAS</span>`;
+                    renderizarGridObras(achados);
+                }, 300); // Só busca 300 milissegundos depois que a pessoa parar de digitar
             });
         }
 
@@ -700,9 +803,14 @@
 
         function fecharAbaGenerosERunSearch(nomeG) {
             history.pushState({ navegação: 'catalogo', parametro: nomeG }, '');
+            
             document.getElementById("viewHome").classList.add("hidden");
-            document.getElementById("viewCatalogo").classList.remove("hidden");
             document.getElementById("viewGeneros").classList.add("hidden");
+            
+            const catalogo = document.getElementById("viewCatalogo");
+            catalogo.classList.remove("hidden");
+            retriggerAnimation("viewCatalogo");
+
             document.getElementById("footerTexto").classList.add("hidden");
             document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
             
@@ -719,6 +827,9 @@
             renderizarGridObras(filtradas);
         }
 
+        // ==========================================================================
+        // FLUXO DO MODAL
+        // ==========================================================================
         function abrirModalObra(id) {
             history.pushState({ navegação: 'modal', id_obra: id }, '');
             abrirModalVisual(id, true);
@@ -728,7 +839,7 @@
 
         function fecharModalVisual() {
             document.getElementById("modalObra").classList.add("hidden");
-            document.body.style.overflow = "auto";
+            document.body.style.overflow = "auto"; // Destrava obrigatoriamente
             fecharMiniCinema();
         }
 
@@ -770,7 +881,6 @@
                 ${sinopseHtml}
                 `;
 
-                // Logica do Detetive de Links para Livros
                 let linksLivroHtml = "";
                 if(link.link_epub && link.link_epub.trim() !== "") linksLivroHtml += `<a class="link-livro" href="${link.link_epub}" target="_blank">epub</a>`;
                 if(link.link_pdf && link.link_pdf.trim() !== "") linksLivroHtml += `<a class="link-livro" href="${link.link_pdf}" target="_blank">pdf</a>`;
@@ -808,7 +918,6 @@
                 ${sinopseHtml}
                 `;
 
-                // Logica do Detetive de Links para Filmes
                 let temLeg = link.link_legendado && link.link_legendado.trim() !== "";
                 let temDub = link.link_dublado && link.link_dublado.trim() !== "";
 
@@ -898,8 +1007,13 @@
                 html += `</div></div>`;
             }
 
+            const modal = document.getElementById("modalObra");
             document.getElementById("modalConteudoDinamico").innerHTML = html;
-            document.getElementById("modalObra").classList.remove("hidden");
+            
+            modal.classList.remove("hidden");
+            retriggerAnimation("modalObra");
+            
+            // Trava o fundo PARA A LEITURA. O botão voltar DESTAVA isso na linha 391.
             document.body.style.overflow = "hidden";
         }
 
