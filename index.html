@@ -55,12 +55,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Aplica animação sempre que uma seção perde a classe .hidden */
         section:not(.hidden), .modal-overlay:not(.hidden) {
             animation: fadeSlideUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
         }
 
-        /* Efeitos de Levitar e Interação (Hover / Active) */
         .categoria-flutuante, .tag-modal, .linha-genero, .link-streaming, .link-livro, .ep-link-btn, .logo-site {
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
@@ -161,7 +159,9 @@
            ========================================================================== */
         .tela-inicial {
             position: relative;
-            height: 450px;
+            min-height: 450px;
+            height: 70vh;
+            max-height: 600px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -172,7 +172,7 @@
             max-width: 150px;
             pointer-events: none;
             user-select: none;
-            animation: float 6s ease-in-out infinite; /* Sutil flutuação na borboleta */
+            animation: float 6s ease-in-out infinite;
         }
 
         @keyframes float {
@@ -301,15 +301,23 @@
         .linha-genero span { color: var(--texto-escuro); margin-left: 5px; }
 
         /* ==========================================================================
-           MODAL DE DETALHES
+           MODAL DE DETALHES (O CONSERTO DO SCROLL E TÍTULOS GRANDES)
            ========================================================================== */
         .modal-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; min-height: 100%;
+            position: fixed; /* Isso impede o bug do "corte" na rolagem inferior */
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100vh;
             background-color: var(--bg-principal);
             z-index: 1000;
-            padding: 20px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-conteudo {
+            padding: 20px;
+            padding-bottom: 80px; /* Garante que os comentários no final respirem */
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .botao-fechar-modal {
@@ -348,14 +356,17 @@
         
         .info-bloco-esquerda { flex: 1; }
 
+        /* Conserto dos Títulos Longos Se Esmagando */
         .titulo-obra-modal {
             font-family: var(--font-titulo);
-            font-size: 38px;
-            line-height: 0.9;
-            transform: scaleY(1.2);
+            font-size: 34px;
+            line-height: 1.1; /* Respira mais para não encavalar */
+            transform: scaleY(1.1);
             transform-origin: top left;
-            margin-bottom: 12px;
+            margin-bottom: 18px;
             letter-spacing: -1px;
+            word-wrap: break-word; /* Quebra palavras enormes */
+            hyphens: auto;
         }
 
         .autor-diretor-modal {
@@ -386,7 +397,8 @@
             font-size: 11px;
             margin-bottom: 15px;
         }
-        .tag-modal { text-decoration: underline; margin-right: 8px; cursor: pointer; display: inline-block; }
+        .tag-modal { text-decoration: underline; margin-right: 8px; cursor: pointer; display: inline-block; transition: font-weight 0.2s ease;}
+        .tag-modal:hover { font-weight: bold; }
         .tag-modal.bold { font-weight: bold; }
 
         .bloco-outros-titulos { margin-bottom: 20px; }
@@ -450,6 +462,8 @@
         .ep-titulo-linha {
             font-size: 11px;
             margin-bottom: 8px;
+            word-wrap: break-word; /* Protege títulos de episódios também */
+            line-height: 1.3;
         }
         .ep-num { font-weight: bold; }
         .ep-sinopse {
@@ -582,6 +596,24 @@
          ::`;
 
         // ==========================================================================
+        // FUNÇÃO GLOBAL DE ORDENAÇÃO (O Mais Recente Primeiro)
+        // ==========================================================================
+        function ordenarPorDataAdicao(obras) {
+            return obras.sort((a, b) => {
+                let dataA = a.data_adicao || "01/01/2000";
+                let dataB = b.data_adicao || "01/01/2000";
+                let partesA = dataA.split('/');
+                let partesB = dataB.split('/');
+                
+                // Converte DD/MM/YYYY para milissegundos para cálculo perfeito
+                let dtA = new Date(partesA[2], partesA[1] - 1, partesA[0]).getTime();
+                let dtB = new Date(partesB[2], partesB[1] - 1, partesB[0]).getTime();
+                
+                return dtB - dtA; // Força o mais recente a ir para o topo
+            });
+        }
+
+        // ==========================================================================
         // INICIALIZAÇÃO ASSÍNCRONA E NAVEGAÇÃO SEGURA
         // ==========================================================================
         window.addEventListener('load', async () => {
@@ -619,10 +651,8 @@
             }
         }
 
-        // CONSERTO DEFINITIVO DO BOTÃO VOLTAR DO CELULAR
         window.addEventListener('popstate', (event) => {
-            // Regra de Ouro: Sempre destravar o scroll quando usar o botão voltar
-            document.body.style.overflow = "auto";
+            document.body.style.overflow = "auto"; // Proteção extra contra scroll travado
             fecharMiniCinema();
 
             if (!event.state) {
@@ -646,7 +676,7 @@
         });
 
         function navegarPara(destino, parametro = null) {
-            document.body.style.overflow = "auto"; // Garante limpeza
+            document.body.style.overflow = "auto"; 
             if (destino === 'home') {
                 history.pushState({ navegação: 'home' }, '');
                 renderizarVisualHome();
@@ -669,7 +699,7 @@
         function retriggerAnimation(elementId) {
             const el = document.getElementById(elementId);
             el.style.animation = 'none';
-            el.offsetHeight; // trigger reflow
+            el.offsetHeight;
             el.style.animation = null; 
         }
 
@@ -700,13 +730,9 @@
             document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
 
             let filtradas = cat === 'Todos' ? [...bancoDadosObras] : bancoDadosObras.filter(o => (o.categoria || "").toLowerCase() === cat.toLowerCase());
-            filtradas.sort((a, b) => {
-                let dataA = a.data_adicao || "01/01/2000";
-                let dataB = b.data_adicao || "01/01/2000";
-                let partesA = dataA.split('/');
-                let partesB = dataB.split('/');
-                return new Date(partesB[2], partesB[1] - 1, partesB[0]) - new Date(partesA[2], partesA[1] - 1, partesA[0]);
-            });
+            
+            // Aplica a ordem temporal global
+            filtradas = ordenarPorDataAdicao(filtradas);
 
             document.getElementById("tituloAbaCatalogo").innerHTML = `${cat.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
             renderizarGridObras(filtradas);
@@ -735,7 +761,7 @@
             input.addEventListener("input", (e) => {
                 let termo = e.target.value.toLowerCase().trim();
                 
-                clearTimeout(timeoutBusca); // Cancela a busca anterior se digitar rápido
+                clearTimeout(timeoutBusca);
                 
                 timeoutBusca = setTimeout(() => {
                     if(termo === "") { navegarPara('home'); return; }
@@ -763,9 +789,12 @@
                                gen.includes(termo) || ano.includes(termo) || cat.includes(termo) || pais.includes(termo);
                     });
                     
+                    // Aplica a ordem temporal global nos resultados da busca
+                    achados = ordenarPorDataAdicao(achados);
+
                     document.getElementById("tituloAbaCatalogo").innerHTML = `BUSCA <span>${achados.length} OBRAS</span>`;
                     renderizarGridObras(achados);
-                }, 300); // Só busca 300 milissegundos depois que a pessoa parar de digitar
+                }, 300); 
             });
         }
 
@@ -815,13 +844,9 @@
             document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
             
             let filtradas = bancoDadosObras.filter(o => (o.generos || "").toLowerCase().includes(nomeG.toLowerCase()));
-            filtradas.sort((a, b) => {
-                let dataA = a.data_adicao || "01/01/2000";
-                let dataB = b.data_adicao || "01/01/2000";
-                let partesA = dataA.split('/');
-                let partesB = dataB.split('/');
-                return new Date(partesB[2], partesB[1] - 1, partesB[0]) - new Date(partesA[2], partesA[1] - 1, partesA[0]);
-            });
+            
+            // Aplica a ordem temporal global
+            filtradas = ordenarPorDataAdicao(filtradas);
 
             document.getElementById("tituloAbaCatalogo").innerHTML = `GÊNERO: ${nomeG.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
             renderizarGridObras(filtradas);
@@ -839,7 +864,7 @@
 
         function fecharModalVisual() {
             document.getElementById("modalObra").classList.add("hidden");
-            document.body.style.overflow = "auto"; // Destrava obrigatoriamente
+            document.body.style.overflow = "auto"; 
             fecharMiniCinema();
         }
 
@@ -1013,8 +1038,7 @@
             modal.classList.remove("hidden");
             retriggerAnimation("modalObra");
             
-            // Trava o fundo PARA A LEITURA. O botão voltar DESTAVA isso na linha 391.
-            document.body.style.overflow = "hidden";
+            document.body.style.overflow = "hidden"; // Apenas trava o fundo
         }
 
         function dispararMiniCinema(url, elClick, storageKey) {
