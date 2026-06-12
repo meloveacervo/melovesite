@@ -33,6 +33,8 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html { scroll-behavior: smooth; }
+
         body {
             background-color: var(--bg-principal);
             color: var(--texto-escuro);
@@ -48,25 +50,25 @@
         .hidden { display: none !important; }
 
         /* ==========================================================================
-           ANIMAÇÕES E SUAVIZAÇÃO DE INTERFACES (SMOOTHNESS)
+           ANIMAÇÕES SUAVES E LEVES
            ========================================================================== */
         @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        section:not(.hidden), .modal-overlay:not(.hidden) {
-            animation: fadeSlideUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        section:not(.hidden) {
+            animation: fadeSlideUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
         }
 
         .categoria-flutuante, .tag-modal, .linha-genero, .link-streaming, .link-livro, .ep-link-btn, .logo-site {
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: all 0.2s ease-out;
         }
 
         .categoria-flutuante:hover, .tag-modal:hover, .link-streaming:hover, .link-livro:hover, .ep-link-btn:hover {
             transform: translateY(-2px);
             color: #444444;
-            text-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
         .linha-genero:hover {
@@ -75,14 +77,12 @@
         }
 
         .categoria-flutuante:active, .tag-modal:active, .link-streaming:active, .link-livro:active, .ep-link-btn:active, .item-obra:active {
-            transform: translateY(1px) scale(0.97);
+            transform: translateY(1px) scale(0.98);
             opacity: 0.8;
         }
 
-        .logo-site:active { transform: scaleY(1.1) scale(0.95); }
-
         /* ==========================================================================
-           CABEÇALHO GLOBAL
+           CABEÇALHO & BUSCA
            ========================================================================== */
         header {
             text-align: center;
@@ -107,9 +107,6 @@
             color: #aaaaaa;
         }
 
-        /* ==========================================================================
-           BARRA DE PESQUISA
-           ========================================================================== */
         .container-busca {
             padding: 0 20px;
             margin-bottom: 30px;
@@ -121,12 +118,10 @@
             display: flex;
             align-items: center;
             padding: 8px 12px;
-            transition: box-shadow 0.3s ease;
+            transition: box-shadow 0.2s ease;
         }
         
-        .wrapper-input:focus-within {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
+        .wrapper-input:focus-within { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
         .icone-busca {
             font-size: 14px;
@@ -151,11 +146,10 @@
             margin-top: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: opacity 0.3s ease;
         }
 
         /* ==========================================================================
-           TELA INICIAL
+           TELA INICIAL & FLOATERS
            ========================================================================== */
         .tela-inicial {
             position: relative;
@@ -165,11 +159,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .borboleta-imagem {
-            max-width: 150px;
+            max-width: 140px;
             pointer-events: none;
             user-select: none;
             animation: float 6s ease-in-out infinite;
@@ -177,43 +171,45 @@
 
         @keyframes float {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
+            50% { transform: translateY(-6px); }
             100% { transform: translateY(0px); }
         }
 
         .categoria-flutuante {
             position: absolute;
-            font-size: 10px;
+            font-size: 9px;
             text-transform: uppercase;
             cursor: pointer;
             letter-spacing: 1px;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.85);
             padding: 4px 8px;
             border-radius: 4px;
             z-index: 10;
         }
-        .categoria-flutuante:hover { font-weight: bold; }
 
+        /* Ajuste de Posições (Adicionado Autores e Países) */
         #cat-catalogo   { top: 5%; left: 50%; transform: translateX(-50%); }
-        #cat-generos    { top: 20%; left: 10%; }
-        #cat-filmes     { top: 25%; right: 10%; }
-        #cat-series     { top: 60%; left: 12%; }
-        #cat-animes     { top: 65%; right: 15%; }
-        #cat-animacoes  { bottom: 15%; left: 25%; }
+        #cat-generos    { top: 18%; left: 8%; }
+        #cat-paises     { top: 22%; right: 10%; }
+        #cat-filmes     { top: 40%; left: 5%; }
+        #cat-series     { top: 48%; right: 5%; }
+        #cat-animes     { top: 65%; left: 8%; }
+        #cat-animacoes  { bottom: 18%; right: 10%; }
         #cat-doramas    { bottom: 25%; left: 50%; transform: translateX(-50%); }
-        #cat-livros     { bottom: 10%; right: 20%; }
+        #cat-autores    { bottom: 8%; left: 15%; }
+        #cat-livros     { bottom: 5%; right: 25%; }
 
         footer {
             text-align: center;
             font-size: 8px;
             color: #aaaaaa;
-            padding: 40px 20px 20px 20px;
+            padding: 40px 20px 30px 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         /* ==========================================================================
-           ABA CATÁLOGO (3 Colunas)
+           GRID CATÁLOGO & LISTAGENS
            ========================================================================== */
         .titulo-aba {
             font-family: var(--font-alternativa);
@@ -250,19 +246,13 @@
             overflow: hidden;
             background-color: #f0f0f0;
             position: relative;
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
-        }
-
-        .item-obra:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
         .poster-imagem {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: filter 0.3s ease, transform 0.5s ease;
+            transition: filter 0.3s ease;
         }
 
         .item-obra.status-off .poster-imagem { filter: grayscale(100%) brightness(40%); }
@@ -280,10 +270,7 @@
             font-weight: bold;
         }
 
-        /* ==========================================================================
-           ABA GÊNEROS
-           ========================================================================== */
-        .grid-generos {
+        .grid-listagem {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px 10px;
@@ -296,26 +283,31 @@
         .linha-genero {
             cursor: pointer;
             color: var(--texto-mutado);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 5px;
         }
-        
-        .linha-genero span { color: var(--texto-escuro); margin-left: 5px; }
+        .linha-genero span { color: var(--texto-escuro); margin-left: 5px; font-weight: bold;}
 
         /* ==========================================================================
-           MODAL DE DETALHES (O CONSERTO DO SCROLL E TÍTULOS GRANDES)
+           MODAL DE DETALHES (FIX DO SCROLL E TÍTULOS)
            ========================================================================== */
         .modal-overlay {
-            position: fixed; /* Isso impede o bug do "corte" na rolagem inferior */
+            position: fixed; /* TRAVA O MODAL NA TELA (Fim dos cortes) */
             top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100vh;
+            width: 100%; height: 100%;
             background-color: var(--bg-principal);
             z-index: 1000;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            padding-bottom: 60px; /* Respiro no fundo */
         }
+        
+        .modal-overlay.hidden { display: none !important; }
 
         .modal-conteudo {
-            padding: 20px;
-            padding-bottom: 80px; /* Garante que os comentários no final respirem */
             max-width: 500px;
             margin: 0 auto;
         }
@@ -327,11 +319,8 @@
             font-weight: 300;
             cursor: pointer;
             margin-bottom: 15px;
-            transition: opacity 0.2s ease;
         }
-        .botao-fechar-modal:active { opacity: 0.5; }
 
-        .header-modal-filme { display: block; }
         .banner-obra-modal {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -347,25 +336,23 @@
             margin-bottom: 20px;
         }
         .capa-livro-modal {
-            width: 130px;
+            width: 120px;
             aspect-ratio: 2 / 3;
             object-fit: cover;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
-        .info-bloco-esquerda { flex: 1; }
+        .info-bloco-esquerda { flex: 1; min-width: 0; }
 
-        /* Conserto dos Títulos Longos Se Esmagando */
         .titulo-obra-modal {
             font-family: var(--font-titulo);
             font-size: 34px;
-            line-height: 1.1; /* Respira mais para não encavalar */
-            transform: scaleY(1.1);
-            transform-origin: top left;
-            margin-bottom: 18px;
+            line-height: 1.1; 
+            margin-bottom: 12px;
             letter-spacing: -1px;
-            word-wrap: break-word; /* Quebra palavras enormes */
+            word-wrap: break-word; /* Fim do esmagamento de títulos gigantes */
+            overflow-wrap: break-word;
             hyphens: auto;
         }
 
@@ -383,6 +370,7 @@
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
+            color: var(--texto-escuro);
         }
 
         .badge-classificacao {
@@ -396,9 +384,9 @@
         .container-tags-generos {
             font-size: 11px;
             margin-bottom: 15px;
+            line-height: 1.6;
         }
-        .tag-modal { text-decoration: underline; margin-right: 8px; cursor: pointer; display: inline-block; transition: font-weight 0.2s ease;}
-        .tag-modal:hover { font-weight: bold; }
+        .tag-modal { text-decoration: underline; margin-right: 8px; cursor: pointer; display: inline-block; }
         .tag-modal.bold { font-weight: bold; }
 
         .bloco-outros-titulos { margin-bottom: 20px; }
@@ -410,6 +398,7 @@
             line-height: 1.5;
             text-align: justify;
             margin-bottom: 30px;
+            color: #333;
         }
 
         .bloco-links-filme {
@@ -421,7 +410,7 @@
         .link-streaming { font-size: 14px; font-weight: bold; text-decoration: underline; cursor: pointer; display: inline-block;}
         .link-streaming.visto { color: #ccc !important; text-decoration: none; }
 
-        .bloco-legendas { font-size: 10px; }
+        .bloco-legendas { font-size: 10px; margin-bottom: 20px;}
         .label-legendas { font-family: var(--font-titulo); font-size: 16px; margin-bottom: 5px; }
 
         .bloco-links-livro {
@@ -445,7 +434,6 @@
             align-items: center;
             gap: 15px;
             margin-bottom: 25px;
-            cursor: pointer;
         }
 
         .item-episodio {
@@ -455,14 +443,11 @@
             align-items: flex-start;
         }
         
-        .ep-info-esquerda {
-            flex: 1;
-            padding-right: 15px;
-        }
+        .ep-info-esquerda { flex: 1; padding-right: 15px; }
         .ep-titulo-linha {
             font-size: 11px;
             margin-bottom: 8px;
-            word-wrap: break-word; /* Protege títulos de episódios também */
+            word-wrap: break-word;
             line-height: 1.3;
         }
         .ep-num { font-weight: bold; }
@@ -472,11 +457,7 @@
             color: var(--texto-mutado);
         }
 
-        .ep-links-direita {
-            text-align: right;
-            font-size: 10px;
-            min-width: 70px;
-        }
+        .ep-links-direita { text-align: right; font-size: 10px; min-width: 70px; }
         .ep-duracao { margin-bottom: 10px; display: block; }
         .ep-link-btn {
             font-weight: bold;
@@ -494,11 +475,10 @@
             border-radius: 8px;
             overflow: hidden;
             margin-bottom: 15px;
-            transition: all 0.4s ease;
         }
         .iframe-player { width: 100%; height: 100%; border: none; }
 
-        .container-comentarios-modal { margin-top: 40px; border-top: 1px solid var(--linha-fina); padding-top: 30px; }
+        .container-comentarios-modal { margin-top: 30px; border-top: 1px solid var(--linha-fina); padding-top: 30px; }
         .titulo-comentarios { font-family: var(--font-titulo); font-size: 18px; margin-bottom: 15px; }
 
     </style>
@@ -513,16 +493,19 @@
     <div class="container-busca" id="areaBusca">
         <div class="wrapper-input">
             <span class="icone-busca">⚲</span>
-            <input type="text" id="campoPesquisa" class="input-busca">
+            <input type="text" id="campoPesquisa" class="input-busca" placeholder="Pesquisar...">
         </div>
-        <div id="subtextoDinamicoBusca" class="subtexto-busca">SINCRONIZANDO PLANILHA...</div>
+        <div id="subtextoDinamicoBusca" class="subtexto-busca">CARREGANDO ACERVO...</div>
     </div>
 
     <main id="conteudoPrincipal">
         
         <section id="viewHome" class="tela-inicial hidden">
             <div class="categoria-flutuante" id="cat-catalogo" onclick="navegarPara('catalogo', 'Todos')">CATÁLOGO</div>
-            <div class="categoria-flutuante" id="cat-generos" onclick="navegarPara('generos')">GÊNEROS</div>
+            <div class="categoria-flutuante" id="cat-generos" onclick="navegarPara('lista', 'generos')">GÊNEROS</div>
+            <div class="categoria-flutuante" id="cat-paises" onclick="navegarPara('lista', 'pais')">PAÍSES</div>
+            <div class="categoria-flutuante" id="cat-autores" onclick="navegarPara('lista', 'diretor_autor')">AUTORES & DIRETORES</div>
+            
             <div class="categoria-flutuante" id="cat-filmes" onclick="navegarPara('catalogo', 'Filme')">FILMES</div>
             
             <img class="borboleta-imagem" src="borboleta.jpg" alt="Butterfly Graphic">
@@ -539,16 +522,16 @@
             <div class="grid-catalogo" id="gridObras"></div>
         </section>
 
-        <section id="viewGeneros" class="hidden">
-            <div class="titulo-aba" id="tituloAbaGeneros">GÊNEROS <span></span></div>
-            <div class="grid-generos" id="listaGenerosContainer"></div>
+        <section id="viewListagem" class="hidden">
+            <div class="titulo-aba" id="tituloAbaListagem">LISTA <span></span></div>
+            <div class="grid-listagem" id="containerListagem"></div>
         </section>
 
     </main>
 
     <div id="modalObra" class="modal-overlay hidden">
         <div class="modal-conteudo">
-            <div class="botao-fechar-modal" onclick="fecharModalPeloBotao()">X</div>
+            <div class="botao-fechar-modal" onclick="history.back()">X</div>
             
             <div id="wrapperPlayerVideo" class="wrapper-player-video hidden">
                 <iframe id="iframePlayerVideo" class="iframe-player" src="" allowfullscreen></iframe>
@@ -573,7 +556,7 @@
 
     <script>
         // ==========================================================================
-        // CÉREBRO: BANCO DE DADOS DINÂMICO (Via Google Sheets)
+        // CÉREBRO: BANCO DE DADOS DINÂMICO
         // ==========================================================================
         const URL_CATALOGO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=1518895542&single=true&output=csv";
         const URL_LINKS_UNICOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSgY6Y800fXfGwfPrle-rzhjeUQfFT4Pcb7QiJ1gUHlvwsrL-6x_UiZLd3pVUWeUvaJvwIewp85sGpc/pub?gid=1143473702&single=true&output=csv";
@@ -596,34 +579,32 @@
          ::`;
 
         // ==========================================================================
-        // FUNÇÃO GLOBAL DE ORDENAÇÃO (O Mais Recente Primeiro)
+        // LÓGICA DE ORDENAÇÃO GLOBAL (Data e Ano)
         // ==========================================================================
-        function ordenarPorDataAdicao(obras) {
+        function ordenarDecrescente(obras) {
             return obras.sort((a, b) => {
-                let dataA = a.data_adicao || "01/01/2000";
-                let dataB = b.data_adicao || "01/01/2000";
-                let partesA = dataA.split('/');
-                let partesB = dataB.split('/');
-                
-                // Converte DD/MM/YYYY para milissegundos para cálculo perfeito
-                let dtA = new Date(partesA[2], partesA[1] - 1, partesA[0]).getTime();
-                let dtB = new Date(partesB[2], partesB[1] - 1, partesB[0]).getTime();
-                
-                return dtB - dtA; // Força o mais recente a ir para o topo
+                function extractTime(obj) {
+                    let d = obj.data_adicao || "";
+                    if(d.includes('/')) {
+                        let p = d.split('/');
+                        if(p.length === 3) return new Date(p[2], p[1]-1, p[0]).getTime();
+                    }
+                    let ano = parseInt(obj.ano);
+                    if(!isNaN(ano)) return new Date(ano, 0, 1).getTime();
+                    return 0;
+                }
+                return extractTime(b) - extractTime(a);
             });
         }
 
         // ==========================================================================
-        // INICIALIZAÇÃO ASSÍNCRONA E NAVEGAÇÃO SEGURA
+        // INICIALIZAÇÃO & MEMÓRIA (HISTORY API)
         // ==========================================================================
         window.addEventListener('load', async () => {
-            history.replaceState({ navegação: 'home' }, '');
+            history.replaceState({ nav: 'home' }, '');
             await carregarBancoDeDados();
-            configurarBuscadorOtimizado();
-            
-            document.getElementById("viewHome").classList.remove("hidden");
-            document.getElementById("footerTexto").classList.remove("hidden");
-            atualizarContadorObrasGeral(bancoDadosObras.length);
+            configurarBuscadorInteligente();
+            processarEstadoVisual('home');
         });
 
         async function carregarBancoDeDados() {
@@ -646,156 +627,111 @@
                     bancoEpisodios[ep.id_obra].push(ep);
                 });
             } catch (erro) {
-                console.error("Erro fatal ao sincronizar:", erro);
-                document.getElementById("subtextoDinamicoBusca").textContent = "ERRO DE CONEXÃO COM A PLANILHA.";
+                console.error(erro);
+                document.getElementById("subtextoDinamicoBusca").textContent = "ERRO AO CARREGAR O ACERVO.";
             }
         }
 
         window.addEventListener('popstate', (event) => {
-            document.body.style.overflow = "auto"; // Proteção extra contra scroll travado
+            document.body.style.overflow = "auto"; 
             fecharMiniCinema();
-
             if (!event.state) {
-                renderizarVisualHome();
+                processarEstadoVisual('home');
                 document.getElementById("modalObra").classList.add("hidden");
                 return;
             }
-            const estado = event.state.navegação;
-            if (estado === 'home') {
-                renderizarVisualHome();
-                document.getElementById("modalObra").classList.add("hidden");
-            } else if (estado === 'catalogo') {
-                renderizarVisualCatalogo(event.state.parametro);
-                document.getElementById("modalObra").classList.add("hidden");
-            } else if (estado === 'generos') {
-                renderizarVisualGeneros();
-                document.getElementById("modalObra").classList.add("hidden");
-            } else if (estado === 'modal') {
-                abrirModalVisual(event.state.id_obra, false); 
-            }
+            if(event.state.nav !== 'modal') document.getElementById("modalObra").classList.add("hidden");
+            processarEstadoVisual(event.state.nav, event.state.param);
         });
 
         function navegarPara(destino, parametro = null) {
             document.body.style.overflow = "auto"; 
-            if (destino === 'home') {
-                history.pushState({ navegação: 'home' }, '');
-                renderizarVisualHome();
-            } else if (destino === 'catalogo') {
-                history.pushState({ navegação: 'catalogo', parametro: parametro }, '');
-                renderizarVisualCatalogo(parametro);
-            } else if (destino === 'generos') {
-                history.pushState({ navegação: 'generos' }, '');
-                renderizarVisualGeneros();
+            history.pushState({ nav: destino, param: parametro }, '');
+            processarEstadoVisual(destino, parametro);
+        }
+
+        function processarEstadoVisual(nav, param) {
+            document.getElementById("viewHome").classList.add("hidden");
+            document.getElementById("viewCatalogo").classList.add("hidden");
+            document.getElementById("viewListagem").classList.add("hidden");
+            document.getElementById("footerTexto").classList.add("hidden");
+            document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
+
+            if (nav === 'home') {
+                document.getElementById("viewHome").classList.remove("hidden");
+                document.getElementById("footerTexto").classList.remove("hidden");
+                document.getElementById("subtextoDinamicoBusca").classList.remove("hidden");
+                document.getElementById("campoPesquisa").value = "";
+                document.getElementById("subtextoDinamicoBusca").textContent = `${bancoDadosObras.length} OBRAS AO TOTAL...`;
+            } 
+            else if (nav === 'catalogo') {
+                document.getElementById("viewCatalogo").classList.remove("hidden");
+                let filtradas = param === 'Todos' ? [...bancoDadosObras] : bancoDadosObras.filter(o => (o.categoria || "").toLowerCase() === param.toLowerCase());
+                filtradas = ordenarDecrescente(filtradas);
+                document.getElementById("tituloAbaCatalogo").innerHTML = `${param.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
+                renderizarGridObras(filtradas);
+            }
+            else if (nav === 'filtro') {
+                // Filtra por gênero, diretor ou pais
+                document.getElementById("viewCatalogo").classList.remove("hidden");
+                let filtradas = bancoDadosObras.filter(o => {
+                    let alvo = (o[param.coluna] || "").toLowerCase();
+                    return alvo.includes(param.valor.toLowerCase());
+                });
+                filtradas = ordenarDecrescente(filtradas);
+                document.getElementById("tituloAbaCatalogo").innerHTML = `${param.valor.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
+                renderizarGridObras(filtradas);
+            }
+            else if (nav === 'lista') {
+                document.getElementById("viewListagem").classList.remove("hidden");
+                renderizarListaGenerica(param); // 'generos', 'diretor_autor', ou 'pais'
+            }
+            else if (nav === 'busca') {
+                document.getElementById("viewCatalogo").classList.remove("hidden");
+                document.getElementById("campoPesquisa").value = param;
+                executarBusca(param);
+            }
+            else if (nav === 'modal') {
+                abrirModalVisual(param);
             }
         }
 
         // ==========================================================================
-        // RENDERIZAÇÃO DAS TELAS E ANIMAÇÕES
+        // BUSCA COM MEMÓRIA
         // ==========================================================================
-        function atualizarContadorObrasGeral(total) {
-            document.getElementById("subtextoDinamicoBusca").textContent = `${total} OBRAS AO TOTAL...`;
-        }
-
-        function retriggerAnimation(elementId) {
-            const el = document.getElementById(elementId);
-            el.style.animation = 'none';
-            el.offsetHeight;
-            el.style.animation = null; 
-        }
-
-        function renderizarVisualHome() {
-            document.getElementById("viewCatalogo").classList.add("hidden");
-            document.getElementById("viewGeneros").classList.add("hidden");
-            
-            const home = document.getElementById("viewHome");
-            home.classList.remove("hidden");
-            retriggerAnimation("viewHome");
-
-            document.getElementById("footerTexto").classList.remove("hidden");
-            document.getElementById("areaBusca").classList.remove("hidden");
-            document.getElementById("subtextoDinamicoBusca").classList.remove("hidden");
-            document.getElementById("campoPesquisa").value = "";
-            atualizarContadorObrasGeral(bancoDadosObras.length);
-        }
-
-        function renderizarVisualCatalogo(cat) {
-            document.getElementById("viewHome").classList.add("hidden");
-            document.getElementById("viewGeneros").classList.add("hidden");
-            
-            const catalogo = document.getElementById("viewCatalogo");
-            catalogo.classList.remove("hidden");
-            retriggerAnimation("viewCatalogo");
-
-            document.getElementById("footerTexto").classList.add("hidden");
-            document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
-
-            let filtradas = cat === 'Todos' ? [...bancoDadosObras] : bancoDadosObras.filter(o => (o.categoria || "").toLowerCase() === cat.toLowerCase());
-            
-            // Aplica a ordem temporal global
-            filtradas = ordenarPorDataAdicao(filtradas);
-
-            document.getElementById("tituloAbaCatalogo").innerHTML = `${cat.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
-            renderizarGridObras(filtradas);
-        }
-
-        function renderizarVisualGeneros() {
-            document.getElementById("viewHome").classList.add("hidden");
-            document.getElementById("viewCatalogo").classList.add("hidden");
-            
-            const generos = document.getElementById("viewGeneros");
-            generos.classList.remove("hidden");
-            retriggerAnimation("viewGeneros");
-
-            document.getElementById("footerTexto").classList.add("hidden");
-            document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
-            renderizarListaGeneros();
-        }
-
-        // ==========================================================================
-        // MOTOR DE BUSCA OTIMIZADO (ANTI-LAG - DEBOUNCE)
-        // ==========================================================================
-        function configurarBuscadorOtimizado() {
+        function configurarBuscadorInteligente() {
             const input = document.getElementById("campoPesquisa");
             let timeoutBusca;
 
             input.addEventListener("input", (e) => {
                 let termo = e.target.value.toLowerCase().trim();
-                
                 clearTimeout(timeoutBusca);
-                
                 timeoutBusca = setTimeout(() => {
                     if(termo === "") { navegarPara('home'); return; }
                     
-                    document.getElementById("viewHome").classList.add("hidden");
-                    document.getElementById("viewGeneros").classList.add("hidden");
-                    
-                    const catalogo = document.getElementById("viewCatalogo");
-                    catalogo.classList.remove("hidden");
-                    retriggerAnimation("viewCatalogo");
-
-                    document.getElementById("footerTexto").classList.add("hidden");
-                    document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
-                    
-                    let achados = bancoDadosObras.filter(o => {
-                        let titulo = (o.titulo_principal || "").toLowerCase();
-                        let alt = (o.titulos_alternativos || "").toLowerCase();
-                        let dir = (o.diretor_autor || "").toLowerCase();
-                        let gen = (o.generos || "").toLowerCase();
-                        let ano = (o.ano || "").toString().toLowerCase();
-                        let cat = (o.categoria || "").toLowerCase();
-                        let pais = (o.pais || "").toLowerCase();
-
-                        return titulo.includes(termo) || alt.includes(termo) || dir.includes(termo) || 
-                               gen.includes(termo) || ano.includes(termo) || cat.includes(termo) || pais.includes(termo);
-                    });
-                    
-                    // Aplica a ordem temporal global nos resultados da busca
-                    achados = ordenarPorDataAdicao(achados);
-
-                    document.getElementById("tituloAbaCatalogo").innerHTML = `BUSCA <span>${achados.length} OBRAS</span>`;
-                    renderizarGridObras(achados);
+                    // Salva a busca no histórico para não perder ao voltar do modal!
+                    history.pushState({ nav: 'busca', param: termo }, '');
+                    processarEstadoVisual('busca', termo);
                 }, 300); 
             });
+        }
+
+        function executarBusca(termo) {
+            let achados = bancoDadosObras.filter(o => {
+                let titulo = (o.titulo_principal || "").toLowerCase();
+                let alt = (o.titulos_alternativos || "").toLowerCase();
+                let dir = (o.diretor_autor || "").toLowerCase();
+                let gen = (o.generos || "").toLowerCase();
+                let ano = (o.ano || "").toString().toLowerCase();
+                let cat = (o.categoria || "").toLowerCase();
+                let pais = (o.pais || "").toLowerCase();
+
+                return titulo.includes(termo) || alt.includes(termo) || dir.includes(termo) || 
+                       gen.includes(termo) || ano.includes(termo) || cat.includes(termo) || pais.includes(termo);
+            });
+            achados = ordenarDecrescente(achados);
+            document.getElementById("tituloAbaCatalogo").innerHTML = `BUSCA: ${termo.toUpperCase()} <span>${achados.length} OBRAS</span>`;
+            renderizarGridObras(achados);
         }
 
         function renderizarGridObras(obras) {
@@ -804,75 +740,51 @@
             obras.forEach(obra => {
                 const item = document.createElement("div");
                 item.className = `item-obra ${obra.status_link === 'OFF' ? 'status-off' : ''}`;
-                item.onclick = () => abrirModalObra(obra.id_obra);
+                item.onclick = () => navegarPara('modal', obra.id_obra);
                 item.innerHTML = `<img class="poster-imagem" src="${obra.capa_vertical}" alt="${obra.titulo_principal}">`;
                 grid.appendChild(item);
             });
         }
 
-        function renderizarListaGeneros() {
-            const container = document.getElementById("listaGenerosContainer");
+        // ==========================================================================
+        // LISTAGEM DINÂMICA (Gêneros, Diretores, Países)
+        // ==========================================================================
+        function renderizarListaGenerica(colunaTarget) {
+            const container = document.getElementById("containerListagem");
             container.innerHTML = "";
-            let mapaGeneros = {};
+            let mapaDados = {};
+            
+            let nomeAba = "LISTA";
+            if(colunaTarget === 'generos') nomeAba = "GÊNEROS";
+            if(colunaTarget === 'diretor_autor') nomeAba = "AUTORES & DIRETORES";
+            if(colunaTarget === 'pais') nomeAba = "PAÍSES";
+
             bancoDadosObras.forEach(obra => {
-                let generos = obra.generos || "";
-                generos.split(",").forEach(g => {
-                    let nome = g.trim();
-                    if(nome) mapaGeneros[nome] = (mapaGeneros[nome] || 0) + 1;
+                let valorCell = obra[colunaTarget] || "";
+                // Se for gênero ou diretor, pode ter vírgula
+                valorCell.split(",").forEach(txt => {
+                    let nome = txt.trim();
+                    if(nome) mapaDados[nome] = (mapaDados[nome] || 0) + 1;
                 });
             });
-            let arr = Object.keys(mapaGeneros).map(k => ({nome: k, qtd: mapaGeneros[k]}));
+
+            let arr = Object.keys(mapaDados).map(k => ({nome: k, qtd: mapaDados[k]}));
             arr.sort((a,b) => b.qtd - a.qtd || a.nome.localeCompare(b.nome));
             
-            document.getElementById("tituloAbaGeneros").innerHTML = `GÊNEROS <span>${arr.length}</span>`;
-            arr.forEach(gen => {
-                container.innerHTML += `<div class="linha-genero" onclick="fecharAbaGenerosERunSearch('${gen.nome}')">${gen.nome} <span>${gen.qtd}</span></div>`;
+            document.getElementById("tituloAbaListagem").innerHTML = `${nomeAba} <span>${arr.length}</span>`;
+            arr.forEach(item => {
+                container.innerHTML += `<div class="linha-genero" onclick="navegarPara('filtro', {coluna: '${colunaTarget}', valor: '${item.nome}'})">${item.nome} <span>${item.qtd}</span></div>`;
             });
         }
 
-        function fecharAbaGenerosERunSearch(nomeG) {
-            history.pushState({ navegação: 'catalogo', parametro: nomeG }, '');
-            
-            document.getElementById("viewHome").classList.add("hidden");
-            document.getElementById("viewGeneros").classList.add("hidden");
-            
-            const catalogo = document.getElementById("viewCatalogo");
-            catalogo.classList.remove("hidden");
-            retriggerAnimation("viewCatalogo");
-
-            document.getElementById("footerTexto").classList.add("hidden");
-            document.getElementById("subtextoDinamicoBusca").classList.add("hidden");
-            
-            let filtradas = bancoDadosObras.filter(o => (o.generos || "").toLowerCase().includes(nomeG.toLowerCase()));
-            
-            // Aplica a ordem temporal global
-            filtradas = ordenarPorDataAdicao(filtradas);
-
-            document.getElementById("tituloAbaCatalogo").innerHTML = `GÊNERO: ${nomeG.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
-            renderizarGridObras(filtradas);
-        }
-
         // ==========================================================================
-        // FLUXO DO MODAL
+        // MODAL (FICHA DA OBRA) - RESGATE DE INFOS
         // ==========================================================================
-        function abrirModalObra(id) {
-            history.pushState({ navegação: 'modal', id_obra: id }, '');
-            abrirModalVisual(id, true);
-        }
-
-        function fecharModalPeloBotao() { history.back(); }
-
-        function fecharModalVisual() {
-            document.getElementById("modalObra").classList.add("hidden");
-            document.body.style.overflow = "auto"; 
-            fecharMiniCinema();
-        }
-
-        function abrirModalVisual(id, darResetCinema = true) {
+        function abrirModalVisual(id) {
             const obra = bancoDadosObras.find(o => o.id_obra === id);
             if(!obra) return;
             
-            if(darResetCinema) fecharMiniCinema();
+            fecharMiniCinema();
 
             const cat = (obra.categoria || "").toLowerCase();
             let html = "";
@@ -884,11 +796,12 @@
             let altTitulos = (obra.titulos_alternativos || "").replace(/\\n/g, '<br>');
             let outrosTitulosHtml = altTitulos ? `<div class="bloco-outros-titulos"><div class="label-outros-titulos">Outros títulos:</div><div class="conteudo-outros-titulos">${altTitulos}</div></div>` : "";
 
-            let duracao = obra.duracao_paginas ? ` | ${obra.duracao_paginas}` : "";
-            let infoExtra = obra.info_extra ? `<div class="linha-tecnica">${obra.info_extra}</div>` : "";
-
+            let duracaoPaginas = obra.duracao_paginas ? ` | ${obra.duracao_paginas}` : "";
+            
             if (cat === 'livro') {
                 let link = bancoLinksUnicos[id] || {};
+                let editora = link.editora ? link.editora : (obra.info_extra || "Editora não informada");
+
                 html = `
                 <div class="header-modal-livro">
                     <div class="info-bloco-esquerda">
@@ -897,7 +810,7 @@
                         <div class="linha-tecnica">
                             <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}</span>
                         </div>
-                        ${infoExtra}
+                        <div class="linha-tecnica">${editora}${duracaoPaginas}</div>
                         ${tagsHtml}
                         ${outrosTitulosHtml}
                     </div>
@@ -917,12 +830,8 @@
                         <div class="borboleta-mini-area">
                             <pre style="font-family:monospace; font-size:3px; line-height:1; color:#000;">${separatorASCII}</pre>
                         </div>
-                        <div class="links-livro-col">
-                            ${linksLivroHtml}
-                        </div>
+                        <div class="links-livro-col">${linksLivroHtml}</div>
                     </div>`;
-                } else {
-                    html += `<div style="text-align:center; margin-bottom:30px;"><span style="font-size:12px; color:var(--texto-mutado);">Arquivos indisponíveis.</span></div>`;
                 }
 
             } else if (cat === 'filme' || cat === 'animação') {
@@ -935,7 +844,7 @@
                     <div class="titulo-obra-modal">${obra.titulo_principal}</div>
                     <div class="autor-diretor-modal">por ${obra.diretor_autor || "?"}</div>
                     <div class="linha-tecnica">
-                        <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}${duracao}</span>
+                        <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}${duracaoPaginas}</span>
                     </div>
                     ${tagsHtml}
                     ${outrosTitulosHtml}
@@ -952,15 +861,13 @@
                     if(temLeg && temDub) html += `<div class="borboleta-mini-area"><pre style="font-family:monospace; font-size:3px; line-height:1; color:#000;">${separatorASCII}</pre></div>`;
                     if(temDub) html += `<span class="link-streaming ${vistos.dub?'visto':''}" onclick="dispararMiniCinema('${link.link_dublado}', this, 'filme_${id}_dub')">Dublado</span>`;
                     html += `</div>`;
-                } else {
-                    html += `<div style="text-align:center; margin-bottom:30px;"><span style="font-size:12px; color:var(--texto-mutado);">Links indisponíveis no momento.</span></div>`;
                 }
 
                 if(link.legendas_disponiveis && link.legendas_disponiveis.trim() !== "") {
                     html += `
                     <div class="bloco-legendas">
-                        <div class="label-legendas">Legendas disponíveis</div>
-                        <div style="color:var(--texto-mutado); white-space:pre-wrap;">${link.legendas_disponiveis}</div>
+                        <div class="label-legendas">Idiomas / Legendas:</div>
+                        <div style="color:var(--texto-mutado);">${link.legendas_disponiveis}</div>
                     </div>`;
                 }
 
@@ -1013,7 +920,6 @@
                     if(ep.link_dublado && ep.link_dublado.trim() !== "") {
                         epLinksHtml += `<span class="ep-link-btn ${vistos.dub?'visto':''}" onclick="dispararMiniCinema('${ep.link_dublado}', this, '${kDub}')">Dublado</span>`;
                     }
-                    if(epLinksHtml === "") epLinksHtml = `<span style="font-size:10px; color:var(--texto-mutado);">Em breve</span>`;
 
                     html += `
                     <div class="item-episodio">
@@ -1032,15 +938,13 @@
                 html += `</div></div>`;
             }
 
-            const modal = document.getElementById("modalObra");
             document.getElementById("modalConteudoDinamico").innerHTML = html;
-            
-            modal.classList.remove("hidden");
-            retriggerAnimation("modalObra");
-            
-            document.body.style.overflow = "hidden"; // Apenas trava o fundo
+            document.getElementById("modalObra").classList.remove("hidden");
         }
 
+        // ==========================================================================
+        // UTILITÁRIOS
+        // ==========================================================================
         function dispararMiniCinema(url, elClick, storageKey) {
             if(!url || url==='#' || url==="" || url==="undefined") return;
             marcarComoVisto(elClick, storageKey);
@@ -1083,12 +987,12 @@
 
         function gerarTagsHtml(obra) {
             let cat = obra.categoria || "Obra";
-            let html = `<span class="tag-modal bold" onclick="fecharModalVisual(); navegarPara('catalogo', '${cat}')">${cat}</span> `;
+            let html = `<span class="tag-modal bold" onclick="navegarPara('catalogo', '${cat}')">${cat}</span> `;
             let generos = obra.generos || "";
             generos.split(",").forEach(g => { 
                 let gen = g.trim();
                 if(gen) {
-                    html += `<span class="tag-modal" onclick="fecharModalVisual(); fecharAbaGenerosERunSearch('${gen}')">${gen}</span> `; 
+                    html += `<span class="tag-modal" onclick="navegarPara('filtro', {coluna: 'generos', valor: '${gen}'})">${gen}</span> `; 
                 }
             });
             return html;
