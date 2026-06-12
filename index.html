@@ -46,14 +46,17 @@
             position: relative;
         }
 
+        /* Trava o scroll do body quando o modal abre */
+        body.no-scroll { overflow: hidden; }
+
         a { color: inherit; text-decoration: none; }
         .hidden { display: none !important; }
 
         /* ==========================================================================
-           ANIMAÇÕES NATIVAS SUPER LEVES
+           ANIMAÇÕES SUAVES E LEVES
            ========================================================================== */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -61,8 +64,8 @@
             animation: fadeIn 0.3s ease-out forwards;
         }
 
-        .categoria-flutuante, .tag-modal, .linha-genero, .link-streaming, .link-livro, .ep-link-btn, .logo-site, .autor-diretor-modal {
-            transition: transform 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+        .categoria-flutuante, .tag-modal, .linha-genero, .link-streaming, .link-livro, .ep-link-btn, .logo-site {
+            transition: transform 0.2s ease, color 0.2s ease, opacity 0.2s ease;
         }
 
         .categoria-flutuante:hover, .tag-modal:hover, .link-streaming:hover, .link-livro:hover, .ep-link-btn:hover {
@@ -71,12 +74,12 @@
         }
 
         .categoria-flutuante:active, .tag-modal:active, .link-streaming:active, .link-livro:active, .ep-link-btn:active, .item-obra:active {
-            transform: scale(0.96);
+            transform: scale(0.95);
             opacity: 0.7;
         }
 
         /* ==========================================================================
-           CABEÇALHO & BUSCA NATIVA (TECLADO SUMIR AO IR)
+           CABEÇALHO & BUSCA
            ========================================================================== */
         header {
             text-align: center;
@@ -106,11 +109,7 @@
             margin-bottom: 30px;
         }
 
-        .form-busca {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
+        .form-busca { width: 100%; margin: 0; padding: 0; }
 
         .wrapper-input {
             border: 1px solid var(--texto-escuro);
@@ -118,7 +117,10 @@
             display: flex;
             align-items: center;
             padding: 8px 12px;
+            transition: box-shadow 0.2s ease;
         }
+        
+        .wrapper-input:focus-within { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
         .icone-busca {
             font-size: 14px;
@@ -148,7 +150,7 @@
         }
 
         /* ==========================================================================
-           TELA INICIAL & DISTRIBUIÇÃO DOS FLUTUANTES (SEM ERROS)
+           TELA INICIAL & FLOATERS
            ========================================================================== */
         .tela-inicial {
             position: relative;
@@ -162,7 +164,7 @@
         }
 
         .borboleta-imagem {
-            max-width: 165px; /* Um tiquinho maior como você queria! */
+            max-width: 165px;
             pointer-events: none;
             user-select: none;
             animation: floatBrilho 6s ease-in-out infinite;
@@ -186,7 +188,6 @@
             border: 0.5px solid rgba(0,0,0,0.05);
         }
 
-        /* Realocação Cirúrgica das 11 Categorias ao redor da Borboleta */
         #cat-catalogo   { top: 2%; left: 50%; transform: translateX(-50%); }
         #cat-generos    { top: 15%; left: 5%; }
         #cat-paises     { top: 15%; right: 5%; }
@@ -195,7 +196,7 @@
         #cat-animes     { top: 50%; left: 3%; }
         #cat-animacoes  { top: 50%; right: 3%; }
         #cat-doramas    { bottom: 22%; left: 6%; }
-        #cat-livros     { bottom: 22%; right: 6%; } /* Longe da borboleta! */
+        #cat-livros     { bottom: 22%; right: 6%; } 
         #cat-autores    { bottom: 5%; left: 12%; }
         #cat-diretores  { bottom: 5%; right: 12%; }
 
@@ -209,7 +210,7 @@
         }
 
         /* ==========================================================================
-           GRID DE PÔSTERES (3 COLUNAS)
+           GRID CATÁLOGO & LISTAGENS
            ========================================================================== */
         .titulo-aba {
             font-family: var(--font-alternativa);
@@ -269,9 +270,6 @@
             font-weight: bold;
         }
 
-        /* ==========================================================================
-           ABA DE LISTAGENS CORRIGIDA (ALINHAMENTO SEGURO DE DUAS COLUNAS)
-           ========================================================================== */
         .grid-listagem {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -309,7 +307,7 @@
         }
 
         /* ==========================================================================
-           MODAL DE DETALHES (FIX DO SCROLL E TÍTULOS GRANDES)
+           MODAL DE DETALHES (FICHA DA OBRA)
            ========================================================================== */
         .modal-overlay {
             position: fixed;
@@ -320,7 +318,7 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 20px;
-            padding-bottom: 60px;
+            padding-bottom: 80px; /* Respiro no final do scroll */
         }
 
         .modal-conteudo {
@@ -497,7 +495,7 @@
         }
         .iframe-player { width: 100%; height: 100%; border: none; }
 
-        .container-comentarios-modal { margin-top: 30px; border-top: 1px solid var(--linha-fina); padding-top: 30px; }
+        .container-comentarios-modal { margin-top: 40px; border-top: 1px solid var(--linha-fina); padding-top: 30px; }
         .titulo-comentarios { font-family: var(--font-titulo); font-size: 18px; margin-bottom: 15px; }
 
     </style>
@@ -513,7 +511,7 @@
         <form class="form-busca" id="formBusca" action="javascript:void(0);">
             <div class="wrapper-input">
                 <span class="icone-busca">⚲</span>
-                <input type="search" id="campoPesquisa" class="input-busca" placeholder="Pesquerizar...">
+                <input type="search" id="campoPesquisa" class="input-busca" placeholder="Pesquisar...">
             </div>
         </form>
         <div id="subtextoDinamicoBusca" class="subtexto-busca">CARREGANDO ACERVO...</div>
@@ -525,8 +523,8 @@
             <div class="categoria-flutuante" id="cat-catalogo" onclick="navegarPara('catalogo', 'Todos')">CATÁLOGO</div>
             <div class="categoria-flutuante" id="cat-generos" onclick="navegarPara('lista', 'generos')">GÊNEROS</div>
             <div class="categoria-flutuante" id="cat-paises" onclick="navegarPara('lista', 'pais')">PAÍSES</div>
-            <div class="categoria-flutuante" id="cat-autores" onclick="navegarPara('lista', 'autor_col')">AUTORES</div>
-            <div class="categoria-flutuante" id="cat-diretores" onclick="navegarPara('lista', 'diretor_col')">DIRETORES</div>
+            <div class="categoria-flutuante" id="cat-autores" onclick="navegarPara('lista', 'autor')">AUTORES</div>
+            <div class="categoria-flutuante" id="cat-diretores" onclick="navegarPara('lista', 'diretor')">DIRETORES</div>
             
             <div class="categoria-flutuante" id="cat-filmes" onclick="navegarPara('catalogo', 'Filme')">FILMES</div>
             
@@ -553,7 +551,7 @@
 
     <div id="modalObra" class="modal-overlay hidden">
         <div class="modal-conteudo">
-            <div class="botao-fechar-modal" onclick="history.back()">X</div>
+            <div class="botao-fechar-modal" onclick="fecharModalPeloBotao()">X</div>
             
             <div id="wrapperPlayerVideo" class="wrapper-player-video hidden">
                 <iframe id="iframePlayerVideo" class="iframe-player" src="" allowfullscreen></iframe>
@@ -601,7 +599,7 @@
          ::`;
 
         // ==========================================================================
-        // LÓGICA DE ORDENAÇÃO DECRESCENTE GLOBAL
+        // LÓGICA DE ORDENAÇÃO DECRESCENTE GLOBAL (À Prova de Falhas)
         // ==========================================================================
         function ordenarDecrescente(obras) {
             return obras.sort((a, b) => {
@@ -619,12 +617,8 @@
             });
         }
 
-        function obterValorAutorDiretor(obra, tipoTarget) {
-            return obra.diretor_autor || "";
-        }
-
         // ==========================================================================
-        // HISTORY API RECONSTRUÍDA (FIM DA TELA BRANCA)
+        // HISTORY API BLINDADA (FIM DOS CRASHES E TELA BRANCA)
         // ==========================================================================
         window.addEventListener('load', async () => {
             history.replaceState({ nav: 'home' }, '');
@@ -658,8 +652,13 @@
             }
         }
 
+        // Se a Samy apertar "Voltar" no celular, o site obedece!
         window.addEventListener('popstate', (event) => {
+            // Regra Sagrada: Sempre garantir que a página não fique travada
+            document.body.classList.remove("no-scroll");
+            document.getElementById("modalObra").classList.add("hidden");
             fecharMiniCinema();
+
             if (!event.state) {
                 processarEstadoVisual('home');
                 return;
@@ -668,21 +667,26 @@
         });
 
         function navegarPara(destino, parametro = null) {
+            document.body.classList.remove("no-scroll");
+            document.getElementById("modalObra").classList.add("hidden");
+            fecharMiniCinema();
+            
             history.pushState({ nav: destino, param: parametro }, '');
             processarEstadoVisual(destino, parametro);
         }
 
-        // CONTROLADOR DE ESTADOS PERFEITO (NUNCA DEIXA PÁGINA EM BRANCO)
+        function fecharModalPeloBotao() {
+            history.back(); // Isso aciona o evento popstate acima
+        }
+
+        // CONTROLADOR DE ESTADOS (Motor Principal)
         function processarEstadoVisual(nav, param) {
             if (nav === 'modal') {
                 abrirModalVisual(param);
                 return;
             }
 
-            // Se a rota não for modal, garante que o modal fecha e o scroll destrava
-            document.getElementById("modalObra").classList.add("hidden");
-            document.body.style.overflow = "auto";
-
+            // Oculta tudo para mostrar só a tela certa
             document.getElementById("viewHome").classList.add("hidden");
             document.getElementById("viewCatalogo").classList.add("hidden");
             document.getElementById("viewListagem").classList.add("hidden");
@@ -706,12 +710,6 @@
             else if (nav === 'filtro') {
                 document.getElementById("viewCatalogo").classList.remove("hidden");
                 let filtradas = bancoDadosObras.filter(o => {
-                    if(param.coluna === 'autor_col') {
-                        return (o.categoria || "").toLowerCase() === 'livro' && (o.diretor_autor || "").toLowerCase().includes(param.valor.toLowerCase());
-                    }
-                    if(param.coluna === 'diretor_col') {
-                        return (o.categoria || "").toLowerCase() !== 'livro' && (o.diretor_autor || "").toLowerCase().includes(param.valor.toLowerCase());
-                    }
                     let alvo = (o[param.coluna] || "").toLowerCase();
                     return alvo.includes(param.valor.toLowerCase());
                 });
@@ -750,7 +748,7 @@
 
             form.addEventListener("submit", (e) => {
                 e.preventDefault();
-                input.blur(); // Esconde o teclado nativo imediatamente!
+                input.blur(); // Recolhe o teclado do celular imediatamente!
             });
         }
 
@@ -758,14 +756,16 @@
             let achados = bancoDadosObras.filter(o => {
                 let titulo = (o.titulo_principal || "").toLowerCase();
                 let alt = (o.titulos_alternativos || "").toLowerCase();
-                let dir = (o.diretor_autor || "").toLowerCase();
+                let diretor = (o.diretor || "").toLowerCase();
+                let autor = (o.autor || "").toLowerCase();
                 let gen = (o.generos || "").toLowerCase();
                 let ano = (o.ano || "").toString().toLowerCase();
                 let cat = (o.categoria || "").toLowerCase();
                 let pais = (o.pais || "").toLowerCase();
 
-                return titulo.includes(termo) || alt.includes(termo) || dir.includes(termo) || 
-                       gen.includes(termo) || ano.includes(termo) || cat.includes(termo) || pais.includes(termo);
+                return titulo.includes(termo) || alt.includes(termo) || diretor.includes(termo) || 
+                       autor.includes(termo) || gen.includes(termo) || ano.includes(termo) || 
+                       cat.includes(termo) || pais.includes(termo);
             });
             achados = ordenarDecrescente(achados);
             document.getElementById("tituloAbaCatalogo").innerHTML = `BUSCA: ${termo.toUpperCase()} <span>${achados.length} OBRAS</span>`;
@@ -785,7 +785,7 @@
         }
 
         // ==========================================================================
-        // LISTAGEM DUAL (AUTORES VS DIRETORES BASEADO NA CATEGORIA)
+        // LISTAGEM DINÂMICA (Lê a planilha nova com Autor e Diretor separados!)
         // ==========================================================================
         function renderizarListaGenerica(colunaTarget) {
             const container = document.getElementById("containerListagem");
@@ -794,21 +794,12 @@
             
             let nomeAba = "LISTA";
             if(colunaTarget === 'generos') nomeAba = "GÊNEROS";
-            if(colunaTarget === 'autor_col') nomeAba = "AUTORES";
-            if(colunaTarget === 'diretor_col') nomeAba = "DIRETORES";
+            if(colunaTarget === 'autor') nomeAba = "AUTORES";
+            if(colunaTarget === 'diretor') nomeAba = "DIRETORES";
             if(colunaTarget === 'pais') nomeAba = "PAÍSES";
 
             bancoDadosObras.forEach(obra => {
-                let cat = (obra.categoria || "").toLowerCase();
-                
-                // Filtro inteligente: Autores só puxam Livros. Diretores puxam o resto.
-                if(colunaTarget === 'autor_col' && cat !== 'livro') return;
-                if(colunaTarget === 'diretor_col' && cat === 'livro') return;
-
-                let cell = obra.diretor_autor || "";
-                if(colunaTarget === 'generos') cell = obra.generos || "";
-                if(colunaTarget === 'pais') cell = obra.pais || "";
-
+                let cell = obra[colunaTarget] || "";
                 cell.split(",").forEach(txt => {
                     let nome = txt.trim();
                     if(nome) mapaDados[nome] = (mapaDados[nome] || 0) + 1;
@@ -829,11 +820,13 @@
         }
 
         // ==========================================================================
-        // MODAL (FICHA TÉCNICA REPARADA)
+        // MODAL (A ROTA DA FOFOCA: ARTISTAS E TAGS CLICÁVEIS)
         // ==========================================================================
         function abrirModalVisual(id) {
             const obra = bancoDadosObras.find(o => o.id_obra === id);
             if(!obra) return;
+            
+            fecharMiniCinema();
 
             const cat = (obra.categoria || "").toLowerCase();
             let html = "";
@@ -847,8 +840,16 @@
 
             let duracaoPaginas = obra.duracao_paginas ? ` | ${obra.duracao_paginas}` : "";
             
-            let nomeArtista = obra.diretor_autor || "?";
-            let colFiltro = cat === 'livro' ? 'autor_col' : 'diretor_col';
+            // Inteligência para separar Autor de Diretor (Tudo clicável!)
+            let nomeArtista = "";
+            let colFiltro = "";
+            if (cat === 'livro') {
+                nomeArtista = obra.autor || obra.diretor || "?";
+                colFiltro = 'autor';
+            } else {
+                nomeArtista = obra.diretor || obra.autor || "?";
+                colFiltro = 'diretor';
+            }
             let linkArtistaHtml = `<div class="autor-diretor-modal" onclick="navegarPara('filtro', {coluna: '${colFiltro}', valor: '${nomeArtista.replace(/'/g, "\\'")}'})">por ${nomeArtista}</div>`;
             
             if (cat === 'livro') {
@@ -993,9 +994,14 @@
 
             document.getElementById("modalConteudoDinamico").innerHTML = html;
             document.getElementById("modalObra").classList.remove("hidden");
-            document.body.style.overflow = "hidden"; // Trava o scroll de fundo perfeitamente
+            
+            // Trava fundo
+            document.body.classList.add("no-scroll");
         }
 
+        // ==========================================================================
+        // UTILITÁRIOS
+        // ==========================================================================
         function dispararMiniCinema(url, elClick, storageKey) {
             if(!url || url==='#' || url==="" || url==="undefined") return;
             marcarComoVisto(elClick, storageKey);
@@ -1006,6 +1012,15 @@
             w.classList.remove("hidden");
             if(img) img.classList.add("hidden");
             w.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+
+        function fecharMiniCinema() {
+            const w = document.getElementById("wrapperPlayerVideo");
+            const i = document.getElementById("iframePlayerVideo");
+            const img = document.getElementById("modalImagemFicha");
+            if(i) i.src = "";
+            if(w) w.classList.add("hidden");
+            if(img) img.classList.remove("hidden");
         }
 
         function marcarComoVisto(el, key) {
@@ -1029,7 +1044,7 @@
 
         function gerarTagsHtml(obra) {
             let cat = obra.categoria || "Obra";
-            let html = `<span class="tag-modal bold" onclick="navegarPara('catalogo', '${cat}')">${cat}</span> `;
+            let html = `<span class="tag-modal bold" onclick="navegarPara('catalogo', '${cat.replace(/'/g, "\\'")}')">${cat}</span> `;
             let generos = obra.generos || "";
             generos.split(",").forEach(g => { 
                 let gen = g.trim();
