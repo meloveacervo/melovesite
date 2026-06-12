@@ -238,7 +238,7 @@
         }
 
         /* ==========================================================================
-           GRID CATÁLOGO & LISTAGENS
+           GRID CATÁLOGO E LISTAGENS
            ========================================================================== */
         .titulo-aba {
             font-family: var(--font-alternativa);
@@ -335,7 +335,7 @@
         }
 
         /* ==========================================================================
-           MODAL DE DETALHES (FICHA DA OBRA)
+           MODAL DE DETALHES (FICHA DA OBRA & CAIXA DE COMENTÁRIOS INFINITA)
            ========================================================================== */
         .modal-overlay {
             position: fixed;
@@ -346,7 +346,8 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 20px;
-            padding-bottom: 80px;
+            /* Margem final gigantesca pra caixa de comentário sempre caber liso */
+            padding-bottom: 150px; 
         }
 
         .modal-conteudo {
@@ -461,6 +462,7 @@
             line-height: 1.5;
             text-align: justify;
             margin-bottom: 30px;
+            color: var(--texto-escuro);
         }
 
         .bloco-links-filme {
@@ -537,11 +539,23 @@
             border-radius: 8px;
             overflow: hidden;
             margin-bottom: 15px;
+            transition: all 0.4s ease;
         }
         .iframe-player { width: 100%; height: 100%; border: none; }
 
-        .container-comentarios-modal { margin-top: 40px; border-top: 1px solid var(--linha-fina); padding-top: 30px; }
+        .container-comentarios-modal { 
+            margin-top: 40px; 
+            border-top: 1px solid var(--linha-fina); 
+            padding-top: 30px; 
+        }
         .titulo-comentarios { font-family: var(--font-titulo); font-size: 18px; margin-bottom: 15px; }
+        
+        /* DESTRAVA O TAMANHO INFINITO DO CUSDIS (SEM SCROLL DUPLO) */
+        #cusdis_thread iframe {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 350px !important;
+        }
 
     </style>
 </head>
@@ -906,13 +920,12 @@
         }
 
         // ==========================================================================
-        // CUSDIS INTEGRATION & MODAL
+        // CUSDIS INTEGRATION (Crescimento infinito e sem scroll duplo)
         // ==========================================================================
         function carregarComentariosCusdis(id, titulo) {
             let temaAtual = document.body.classList.contains("dark-theme") ? "dark" : "light";
             const container = document.getElementById("area_comentarios");
             
-            // APP ID do Cusdis configurado pela Samy
             const appID = "e58fbd0e-9316-424a-8e63-2fc070597a6c"; 
 
             container.innerHTML = `
@@ -1122,9 +1135,6 @@
             carregarComentariosCusdis(id, obra.titulo_principal);
         }
 
-        // ==========================================================================
-        // UTILITÁRIOS (PLAYER E VISTOS)
-        // ==========================================================================
         function dispararMiniCinema(url, elClick, storageKey) {
             if(!url || url==='#' || url==="" || url==="undefined") return;
             marcarComoVisto(elClick, storageKey);
@@ -1162,17 +1172,17 @@
             if(c === '14') return 'var(--cl-14)';
             if(c === '16') return 'var(--cl-16)';
             if(c === '18') return 'var(--cl-18)';
-            return '#000';
+            return 'var(--texto-escuro)';
         }
 
         function gerarTagsHtml(obra) {
             let cat = obra.categoria || "Obra";
-            let html = `<span class="tag-modal bold" onclick="navegarPara('catalogo', '${cat.replace(/'/g, "\\'")}')">${cat}</span> `;
+            let html = `<span class="tag-modal bold" onclick="fecharModalVisual(); navegarPara('catalogo', '${cat.replace(/'/g, "\\'")}')">${cat}</span> `;
             let generos = obra.generos || "";
             generos.split(",").forEach(g => { 
                 let gen = g.trim();
                 if(gen) {
-                    html += `<span class="tag-modal" onclick="navegarPara('filtro', {coluna: 'generos', valor: '${gen.replace(/'/g, "\\'")}'})">${gen}</span> `; 
+                    html += `<span class="tag-modal" onclick="fecharModalVisual(); fecharAbaGenerosERunSearch('${gen.replace(/'/g, "\\'")}')">${gen}</span> `; 
                 }
             });
             return html;
