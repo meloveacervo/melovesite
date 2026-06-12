@@ -238,7 +238,7 @@
         }
 
         /* ==========================================================================
-           GRID CATÁLOGO E LISTAGENS
+           GRID CATÁLOGO & LISTAGENS
            ========================================================================== */
         .titulo-aba {
             font-family: var(--font-alternativa);
@@ -346,8 +346,7 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 20px;
-            /* Margem final gigantesca pra caixa de comentário sempre caber liso */
-            padding-bottom: 150px; 
+            padding-bottom: 100px; /* Respiro no final do scroll */
         }
 
         .modal-conteudo {
@@ -549,17 +548,16 @@
             padding-top: 30px; 
         }
         .titulo-comentarios { font-family: var(--font-titulo); font-size: 18px; margin-bottom: 15px; }
-        
-        /* DESTRAVA O TAMANHO INFINITO DO CUSDIS (SEM SCROLL DUPLO) */
-        #cusdis_thread iframe {
-            width: 100% !important;
-            height: auto !important;
-            min-height: 350px !important;
+
+        /* GARANTE QUE O CUSDIS CRESÇA INFINITAMENTE SEM BARRA DE ROLAGEM DUPLA */
+        #cusdis_thread {
+            width: 100%;
+            min-height: 350px;
         }
 
     </style>
 </head>
-<body class="">
+<body>
 
     <header>
         <div id="tema-toggle" class="botao-tema" onclick="alternarTema()">☾ MODO ESCURO</div>
@@ -676,6 +674,13 @@
             let isDark = document.body.classList.contains("dark-theme");
             document.getElementById("tema-toggle").textContent = isDark ? "☀ MODO CLARO" : "☾ MODO ESCURO";
             localStorage.setItem("tema_melove", isDark ? "dark" : "light");
+            
+            // Força a atualização do tema no Cusdis se o modal estiver aberto
+            let obraAbertaId = new URLSearchParams(window.location.search).get('obra');
+            if(obraAbertaId && document.getElementById("modalObra").classList.contains("hidden") === false) {
+                let obra = bancoDadosObras.find(o => o.id_obra === obraAbertaId);
+                if(obra) carregarComentariosCusdis(obra.id_obra, obra.titulo_principal);
+            }
         }
 
         // ==========================================================================
@@ -698,7 +703,7 @@
         }
 
         // ==========================================================================
-        // HISTORY API BLINDADA & COMPARTILHAMENTO
+        // HISTORY API BLINDADA & NAVEGAÇÃO
         // ==========================================================================
         window.addEventListener('load', async () => {
             aplicarTemaInicial();
@@ -762,8 +767,14 @@
             let novaUrl = window.location.pathname;
             if (destino === 'modal') novaUrl += `?obra=${parametro}`;
             
-            history.pushState({ nav: destino, param: parametro }, '', novaUrl);
-            processarEstadoVisual(destino, parametro);
+            // Corrige o bug do [object Object] transformando os filtros em Strings puras!
+            let paramSalvo = parametro;
+            if(typeof parametro === 'object' && parametro !== null) {
+                paramSalvo = `${parametro.coluna}|${parametro.valor}`;
+            }
+
+            history.pushState({ nav: destino, param: paramSalvo }, '', novaUrl);
+            processarEstadoVisual(destino, paramSalvo);
         }
 
         function fecharModalPeloBotao() { history.back(); }
@@ -799,18 +810,24 @@
             }
             else if (nav === 'filtro') {
                 document.getElementById("viewCatalogo").classList.remove("hidden");
+                
+                // Reconstrói o parâmetro que veio como String
+                let partes = param.split('|');
+                let coluna = partes[0];
+                let valor = partes[1];
+
                 let filtradas = bancoDadosObras.filter(o => {
-                    if(param.coluna === 'autor') {
-                        return (o.categoria || "").toLowerCase() === 'livro' && (o.autor || o.diretor_autor || "").toLowerCase().includes(param.valor.toLowerCase());
+                    if(coluna === 'autor') {
+                        return (o.categoria || "").toLowerCase() === 'livro' && (o.autor || o.diretor_autor || "").toLowerCase().includes(valor.toLowerCase());
                     }
-                    if(param.coluna === 'diretor') {
-                        return (o.categoria || "").toLowerCase() !== 'livro' && (o.diretor || o.diretor_autor || "").toLowerCase().includes(param.valor.toLowerCase());
+                    if(coluna === 'diretor') {
+                        return (o.categoria || "").toLowerCase() !== 'livro' && (o.diretor || o.diretor_autor || "").toLowerCase().includes(valor.toLowerCase());
                     }
-                    let alvo = (o[param.coluna] || "").toLowerCase();
-                    return alvo.includes(param.valor.toLowerCase());
+                    let alvo = (o[coluna] || "").toLowerCase();
+                    return alvo.includes(valor.toLowerCase());
                 });
                 filtradas = ordenarDecrescente(filtradas);
-                document.getElementById("tituloAbaCatalogo").innerHTML = `${param.valor.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
+                document.getElementById("tituloAbaCatalogo").innerHTML = `${valor.toUpperCase()} <span>${filtradas.length} OBRAS</span>`;
                 renderizarGridObras(filtradas);
             }
             else if (nav === 'lista') {
@@ -825,7 +842,7 @@
         }
 
         // ==========================================================================
-        // BUSCA E FORMULÁRIO (BLUR DO TECLADO)
+        // BUSCA E FORMULÁRIO
         // ==========================================================================
         function configurarBuscadorInteligente() {
             const input = document.getElementById("campoPesquisa");
@@ -911,6 +928,8 @@
             
             document.getElementById("tituloAbaListagem").innerHTML = `${nomeAba} <span>${arr.length}</span>`;
             arr.forEach(item => {
+                // Passa o filtro diretamente!
+                let parametroFiltro = {coluna: colunaTarget, valor: item.nome};
                 container.innerHTML += `
                     <div class="linha-genero" onclick="navegarPara('filtro', {coluna: '${colunaTarget}', valor: '${item.nome.replace(/'/g, "\\'")}'})">
                         <div class="nome-item-lista">${item.nome}</div>
@@ -958,6 +977,10 @@
             };
         }
 
+        // Clicadores Auxiliares de Tags (Fim do Object Object Bug)
+        function clicarTagCategoria(cat) { navegarPara('catalogo', cat); }
+        function clicarTagFiltro(coluna, valor) { navegarPara('filtro', {coluna: coluna, valor: valor}); }
+
         function abrirModalVisual(id) {
             const obra = bancoDadosObras.find(o => o.id_obra === id);
             if(!obra) return;
@@ -970,7 +993,18 @@
             let corBadge = obterCorClassificacao(obra.classificacao_etaria || "");
 
             let sinopseHtml = `<div class="sinopse-modal">${obra.sinopse || ""}</div>`;
-            let tagsHtml = `<div class="container-tags-generos">${gerarTagsHtml(obra)}</div>`;
+            
+            // Construção das Tags Clicáveis Funcionais
+            let tagsHtml = `<div class="container-tags-generos">`;
+            tagsHtml += `<span class="tag-modal bold" onclick="clicarTagCategoria('${obra.categoria.replace(/'/g, "\\'")}')">${obra.categoria}</span> `;
+            let generos = obra.generos || "";
+            generos.split(",").forEach(g => { 
+                let gen = g.trim();
+                if(gen) {
+                    tagsHtml += `<span class="tag-modal" onclick="clicarTagFiltro('generos', '${gen.replace(/'/g, "\\'")}')">${gen}</span> `; 
+                }
+            });
+            tagsHtml += `</div>`;
             
             let altTitulos = (obra.titulos_alternativos || "").replace(/\\n/g, '<br>');
             let outrosTitulosHtml = altTitulos ? `<div class="bloco-outros-titulos"><div class="label-outros-titulos">Outros títulos:</div><div class="conteudo-outros-titulos">${altTitulos}</div></div>` : "";
@@ -984,7 +1018,7 @@
                 nomeArtista = obra.diretor || obra.diretor_autor || "?";
                 colFiltro = 'diretor';
             }
-            let linkArtistaHtml = `<div class="autor-diretor-modal" onclick="navegarPara('filtro', {coluna: '${colFiltro}', valor: '${nomeArtista.replace(/'/g, "\\'")}'})">por ${nomeArtista}</div>`;
+            let linkArtistaHtml = `<div class="autor-diretor-modal" onclick="clicarTagFiltro('${colFiltro}', '${nomeArtista.replace(/'/g, "\\'")}')">por ${nomeArtista}</div>`;
             
             if (cat === 'livro') {
                 let link = bancoLinksUnicos[id] || {};
@@ -1172,20 +1206,7 @@
             if(c === '14') return 'var(--cl-14)';
             if(c === '16') return 'var(--cl-16)';
             if(c === '18') return 'var(--cl-18)';
-            return 'var(--texto-escuro)';
-        }
-
-        function gerarTagsHtml(obra) {
-            let cat = obra.categoria || "Obra";
-            let html = `<span class="tag-modal bold" onclick="fecharModalVisual(); navegarPara('catalogo', '${cat.replace(/'/g, "\\'")}')">${cat}</span> `;
-            let generos = obra.generos || "";
-            generos.split(",").forEach(g => { 
-                let gen = g.trim();
-                if(gen) {
-                    html += `<span class="tag-modal" onclick="fecharModalVisual(); fecharAbaGenerosERunSearch('${gen.replace(/'/g, "\\'")}')">${gen}</span> `; 
-                }
-            });
-            return html;
+            return '#000';
         }
     </script>
 </body>
