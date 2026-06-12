@@ -50,35 +50,24 @@
         .hidden { display: none !important; }
 
         /* ==========================================================================
-           ANIMAÇÕES SUAVES E LEVES
+           ANIMAÇÕES NATIVAS ULTRA LEVES
            ========================================================================== */
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         section:not(.hidden) {
-            animation: fadeSlideUp 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            animation: fadeIn 0.3s ease-out forwards;
         }
 
         .categoria-flutuante, .tag-modal, .linha-genero, .link-streaming, .link-livro, .ep-link-btn, .logo-site {
-            transition: all 0.2s ease-out;
-        }
-
-        .categoria-flutuante:hover, .tag-modal:hover, .link-streaming:hover, .link-livro:hover, .ep-link-btn:hover {
-            transform: translateY(-2px);
-            color: #444444;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        }
-
-        .linha-genero:hover {
-            transform: translateX(4px);
-            color: var(--texto-escuro);
+            transition: transform 0.2s ease, color 0.2s ease, opacity 0.2s ease;
         }
 
         .categoria-flutuante:active, .tag-modal:active, .link-streaming:active, .link-livro:active, .ep-link-btn:active, .item-obra:active {
-            transform: translateY(1px) scale(0.98);
-            opacity: 0.8;
+            transform: scale(0.96);
+            opacity: 0.7;
         }
 
         /* ==========================================================================
@@ -112,16 +101,19 @@
             margin-bottom: 30px;
         }
 
+        .form-busca {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         .wrapper-input {
             border: 1px solid var(--texto-escuro);
             border-radius: 6px;
             display: flex;
             align-items: center;
             padding: 8px 12px;
-            transition: box-shadow 0.2s ease;
         }
-        
-        .wrapper-input:focus-within { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
         .icone-busca {
             font-size: 14px;
@@ -137,7 +129,10 @@
             font-family: var(--font-mono);
             font-size: 12px;
             background: transparent;
+            /* Remove o 'x' nativo do iOS para manter o design brutalista limpo */
+            -webkit-appearance: none;
         }
+        .input-busca::-webkit-search-cancel-button { display: none; }
 
         .subtexto-busca {
             text-align: center;
@@ -149,7 +144,7 @@
         }
 
         /* ==========================================================================
-           TELA INICIAL & FLOATERS
+           TELA INICIAL & FLOATERS (Layout Expandido)
            ========================================================================== */
         .tela-inicial {
             position: relative;
@@ -170,9 +165,8 @@
         }
 
         @keyframes float {
-            0% { transform: translateY(0px); }
+            0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-6px); }
-            100% { transform: translateY(0px); }
         }
 
         .categoria-flutuante {
@@ -187,17 +181,16 @@
             z-index: 10;
         }
 
-        /* Ajuste de Posições (Adicionado Autores e Países) */
         #cat-catalogo   { top: 5%; left: 50%; transform: translateX(-50%); }
-        #cat-generos    { top: 18%; left: 8%; }
-        #cat-paises     { top: 22%; right: 10%; }
-        #cat-filmes     { top: 40%; left: 5%; }
-        #cat-series     { top: 48%; right: 5%; }
-        #cat-animes     { top: 65%; left: 8%; }
-        #cat-animacoes  { bottom: 18%; right: 10%; }
+        #cat-generos    { top: 15%; left: 8%; }
+        #cat-paises     { top: 18%; right: 8%; }
+        #cat-filmes     { top: 35%; left: 5%; }
+        #cat-series     { top: 40%; right: 5%; }
+        #cat-animes     { top: 55%; left: 8%; }
+        #cat-animacoes  { top: 60%; right: 8%; }
         #cat-doramas    { bottom: 25%; left: 50%; transform: translateX(-50%); }
-        #cat-autores    { bottom: 8%; left: 15%; }
-        #cat-livros     { bottom: 5%; right: 25%; }
+        #cat-autores    { bottom: 8%; left: 10%; }
+        #cat-diretores  { bottom: 5%; right: 10%; }
 
         footer {
             text-align: center;
@@ -252,7 +245,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: filter 0.3s ease;
         }
 
         .item-obra.status-off .poster-imagem { filter: grayscale(100%) brightness(40%); }
@@ -294,7 +286,7 @@
            MODAL DE DETALHES (FIX DO SCROLL E TÍTULOS)
            ========================================================================== */
         .modal-overlay {
-            position: fixed; /* TRAVA O MODAL NA TELA (Fim dos cortes) */
+            position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%;
             background-color: var(--bg-principal);
@@ -302,10 +294,8 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 20px;
-            padding-bottom: 60px; /* Respiro no fundo */
+            padding-bottom: 60px;
         }
-        
-        .modal-overlay.hidden { display: none !important; }
 
         .modal-conteudo {
             max-width: 500px;
@@ -351,17 +341,22 @@
             line-height: 1.1; 
             margin-bottom: 12px;
             letter-spacing: -1px;
-            word-wrap: break-word; /* Fim do esmagamento de títulos gigantes */
+            word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
         }
 
+        /* Nome do autor clicável super chique */
         .autor-diretor-modal {
             font-style: italic;
             font-size: 11px;
             margin-bottom: 10px;
-            display: block;
+            display: inline-block;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
         }
+        .autor-diretor-modal:active { color: var(--texto-mutado); }
 
         .linha-tecnica {
             font-size: 11px;
@@ -491,10 +486,12 @@
     </header>
 
     <div class="container-busca" id="areaBusca">
-        <div class="wrapper-input">
-            <span class="icone-busca">⚲</span>
-            <input type="text" id="campoPesquisa" class="input-busca" placeholder="Pesquisar...">
-        </div>
+        <form class="form-busca" id="formBusca" action="javascript:void(0);">
+            <div class="wrapper-input">
+                <span class="icone-busca">⚲</span>
+                <input type="search" id="campoPesquisa" class="input-busca" placeholder="Pesquisar...">
+            </div>
+        </form>
         <div id="subtextoDinamicoBusca" class="subtexto-busca">CARREGANDO ACERVO...</div>
     </div>
 
@@ -504,7 +501,8 @@
             <div class="categoria-flutuante" id="cat-catalogo" onclick="navegarPara('catalogo', 'Todos')">CATÁLOGO</div>
             <div class="categoria-flutuante" id="cat-generos" onclick="navegarPara('lista', 'generos')">GÊNEROS</div>
             <div class="categoria-flutuante" id="cat-paises" onclick="navegarPara('lista', 'pais')">PAÍSES</div>
-            <div class="categoria-flutuante" id="cat-autores" onclick="navegarPara('lista', 'diretor_autor')">AUTORES & DIRETORES</div>
+            <div class="categoria-flutuante" id="cat-autores" onclick="navegarPara('lista', 'autor_col')">AUTORES</div>
+            <div class="categoria-flutuante" id="cat-diretores" onclick="navegarPara('lista', 'diretor_col')">DIRETORES</div>
             
             <div class="categoria-flutuante" id="cat-filmes" onclick="navegarPara('catalogo', 'Filme')">FILMES</div>
             
@@ -579,7 +577,7 @@
          ::`;
 
         // ==========================================================================
-        // LÓGICA DE ORDENAÇÃO GLOBAL (Data e Ano)
+        // LÓGICA DE ORDENAÇÃO GLOBAL E INTELIGÊNCIA DE DADOS
         // ==========================================================================
         function ordenarDecrescente(obras) {
             return obras.sort((a, b) => {
@@ -597,8 +595,15 @@
             });
         }
 
+        // Ajuda o site a encontrar o autor ou diretor, mesmo se vc usar apenas 1 coluna
+        function obterValorAutorDiretor(obra, tipoTarget) {
+            if(tipoTarget === 'autor_col') return obra.autor || obra.diretor_autor || "";
+            if(tipoTarget === 'diretor_col') return obra.diretor || obra.diretor_autor || "";
+            return obra[tipoTarget] || "";
+        }
+
         // ==========================================================================
-        // INICIALIZAÇÃO & MEMÓRIA (HISTORY API)
+        // INICIALIZAÇÃO & MEMÓRIA (HISTORY API OTIMIZADA)
         // ==========================================================================
         window.addEventListener('load', async () => {
             history.replaceState({ nav: 'home' }, '');
@@ -646,6 +651,9 @@
 
         function navegarPara(destino, parametro = null) {
             document.body.style.overflow = "auto"; 
+            document.getElementById("modalObra").classList.add("hidden");
+            fecharMiniCinema();
+            
             history.pushState({ nav: destino, param: parametro }, '');
             processarEstadoVisual(destino, parametro);
         }
@@ -672,10 +680,9 @@
                 renderizarGridObras(filtradas);
             }
             else if (nav === 'filtro') {
-                // Filtra por gênero, diretor ou pais
                 document.getElementById("viewCatalogo").classList.remove("hidden");
                 let filtradas = bancoDadosObras.filter(o => {
-                    let alvo = (o[param.coluna] || "").toLowerCase();
+                    let alvo = obterValorAutorDiretor(o, param.coluna).toLowerCase();
                     return alvo.includes(param.valor.toLowerCase());
                 });
                 filtradas = ordenarDecrescente(filtradas);
@@ -684,7 +691,7 @@
             }
             else if (nav === 'lista') {
                 document.getElementById("viewListagem").classList.remove("hidden");
-                renderizarListaGenerica(param); // 'generos', 'diretor_autor', ou 'pais'
+                renderizarListaGenerica(param);
             }
             else if (nav === 'busca') {
                 document.getElementById("viewCatalogo").classList.remove("hidden");
@@ -697,22 +704,28 @@
         }
 
         // ==========================================================================
-        // BUSCA COM MEMÓRIA
+        // BUSCA COM MEMÓRIA & SUMIR TECLADO (BLUR)
         // ==========================================================================
         function configurarBuscadorInteligente() {
             const input = document.getElementById("campoPesquisa");
+            const form = document.getElementById("formBusca");
             let timeoutBusca;
 
+            // Busca enquanto digita
             input.addEventListener("input", (e) => {
                 let termo = e.target.value.toLowerCase().trim();
                 clearTimeout(timeoutBusca);
                 timeoutBusca = setTimeout(() => {
                     if(termo === "") { navegarPara('home'); return; }
-                    
-                    // Salva a busca no histórico para não perder ao voltar do modal!
                     history.pushState({ nav: 'busca', param: termo }, '');
                     processarEstadoVisual('busca', termo);
                 }, 300); 
+            });
+
+            // Se a Samy apertar a lupa ou o "Ir" do celular, esconde o teclado
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                input.blur(); 
             });
         }
 
@@ -740,7 +753,10 @@
             obras.forEach(obra => {
                 const item = document.createElement("div");
                 item.className = `item-obra ${obra.status_link === 'OFF' ? 'status-off' : ''}`;
-                item.onclick = () => navegarPara('modal', obra.id_obra);
+                item.onclick = () => {
+                    history.pushState({ nav: 'modal', id_obra: obra.id_obra }, '');
+                    abrirModalVisual(obra.id_obra);
+                };
                 item.innerHTML = `<img class="poster-imagem" src="${obra.capa_vertical}" alt="${obra.titulo_principal}">`;
                 grid.appendChild(item);
             });
@@ -756,12 +772,12 @@
             
             let nomeAba = "LISTA";
             if(colunaTarget === 'generos') nomeAba = "GÊNEROS";
-            if(colunaTarget === 'diretor_autor') nomeAba = "AUTORES & DIRETORES";
+            if(colunaTarget === 'autor_col') nomeAba = "AUTORES";
+            if(colunaTarget === 'diretor_col') nomeAba = "DIRETORES";
             if(colunaTarget === 'pais') nomeAba = "PAÍSES";
 
             bancoDadosObras.forEach(obra => {
-                let valorCell = obra[colunaTarget] || "";
-                // Se for gênero ou diretor, pode ter vírgula
+                let valorCell = obterValorAutorDiretor(obra, colunaTarget);
                 valorCell.split(",").forEach(txt => {
                     let nome = txt.trim();
                     if(nome) mapaDados[nome] = (mapaDados[nome] || 0) + 1;
@@ -778,7 +794,7 @@
         }
 
         // ==========================================================================
-        // MODAL (FICHA DA OBRA) - RESGATE DE INFOS
+        // MODAL (FICHA DA OBRA) - ROTA DA FOFOCA CLICÁVEL
         // ==========================================================================
         function abrirModalVisual(id) {
             const obra = bancoDadosObras.find(o => o.id_obra === id);
@@ -798,6 +814,10 @@
 
             let duracaoPaginas = obra.duracao_paginas ? ` | ${obra.duracao_paginas}` : "";
             
+            // O nome do autor agora é uma ponte clicável para ver os outros trabalhos dele
+            let nomeArtista = obterValorAutorDiretor(obra, 'autor_col') || "?";
+            let linkArtistaHtml = `<div class="autor-diretor-modal" onclick="navegarPara('filtro', {coluna: 'autor_col', valor: '${nomeArtista}'})">por ${nomeArtista}</div>`;
+            
             if (cat === 'livro') {
                 let link = bancoLinksUnicos[id] || {};
                 let editora = link.editora ? link.editora : (obra.info_extra || "Editora não informada");
@@ -806,7 +826,7 @@
                 <div class="header-modal-livro">
                     <div class="info-bloco-esquerda">
                         <div class="titulo-obra-modal">${obra.titulo_principal || "Sem Título"}</div>
-                        <div class="autor-diretor-modal">por ${obra.diretor_autor || "?"}</div>
+                        ${linkArtistaHtml}
                         <div class="linha-tecnica">
                             <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}</span>
                         </div>
@@ -842,7 +862,7 @@
                 <div class="header-modal-filme">
                     <img class="banner-obra-modal" src="${obra.banner_horizontal || obra.capa_vertical}" alt="${obra.titulo_principal}" id="modalImagemFicha">
                     <div class="titulo-obra-modal">${obra.titulo_principal}</div>
-                    <div class="autor-diretor-modal">por ${obra.diretor_autor || "?"}</div>
+                    ${linkArtistaHtml}
                     <div class="linha-tecnica">
                         <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}${duracaoPaginas}</span>
                     </div>
@@ -879,7 +899,7 @@
                 <div class="header-modal-filme">
                     <img class="banner-obra-modal" src="${obra.banner_horizontal || obra.capa_vertical}" alt="${obra.titulo_principal}" id="modalImagemFicha">
                     <div class="titulo-obra-modal">${obra.titulo_principal}</div>
-                    <div class="autor-diretor-modal">por ${obra.diretor_autor || "?"}</div>
+                    ${linkArtistaHtml}
                     <div class="linha-tecnica">
                         <span>${obra.ano || ""} | <span class="badge-classificacao" style="background:${corBadge}">${obra.classificacao_etaria || ""}</span> | ${obra.pais || ""}${infoEps}</span>
                     </div>
@@ -940,11 +960,9 @@
 
             document.getElementById("modalConteudoDinamico").innerHTML = html;
             document.getElementById("modalObra").classList.remove("hidden");
+            document.body.style.overflow = "hidden"; // Protege apenas o fundo
         }
 
-        // ==========================================================================
-        // UTILITÁRIOS
-        // ==========================================================================
         function dispararMiniCinema(url, elClick, storageKey) {
             if(!url || url==='#' || url==="" || url==="undefined") return;
             marcarComoVisto(elClick, storageKey);
