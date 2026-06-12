@@ -50,10 +50,10 @@
         .hidden { display: none !important; }
 
         /* ==========================================================================
-           ANIMAÇÕES NATIVAS ULTRA LEVES
+           ANIMAÇÕES NATIVAS SUPER LEVES
            ========================================================================== */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -61,8 +61,13 @@
             animation: fadeIn 0.3s ease-out forwards;
         }
 
-        .categoria-flutuante, .tag-modal, .linha-genero, .link-streaming, .link-livro, .ep-link-btn, .logo-site {
-            transition: transform 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        .categoria-flutuante, .tag-modal, .linha-genero, .link-streaming, .link-livro, .ep-link-btn, .logo-site, .autor-diretor-modal {
+            transition: transform 0.2s ease, color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .categoria-flutuante:hover, .tag-modal:hover, .link-streaming:hover, .link-livro:hover, .ep-link-btn:hover {
+            transform: translateY(-2px);
+            color: #444444;
         }
 
         .categoria-flutuante:active, .tag-modal:active, .link-streaming:active, .link-livro:active, .ep-link-btn:active, .item-obra:active {
@@ -71,7 +76,7 @@
         }
 
         /* ==========================================================================
-           CABEÇALHO & BUSCA
+           CABEÇALHO & BUSCA NATIVA (TECLADO SUMIR AO IR)
            ========================================================================== */
         header {
             text-align: center;
@@ -129,7 +134,6 @@
             font-family: var(--font-mono);
             font-size: 12px;
             background: transparent;
-            /* Remove o 'x' nativo do iOS para manter o design brutalista limpo */
             -webkit-appearance: none;
         }
         .input-busca::-webkit-search-cancel-button { display: none; }
@@ -144,13 +148,13 @@
         }
 
         /* ==========================================================================
-           TELA INICIAL & FLOATERS (Layout Expandido)
+           TELA INICIAL & DISTRIBUIÇÃO DOS FLUTUANTES (SEM ERROS)
            ========================================================================== */
         .tela-inicial {
             position: relative;
-            min-height: 450px;
-            height: 70vh;
-            max-height: 600px;
+            min-height: 480px;
+            height: 72vh;
+            max-height: 620px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -158,15 +162,15 @@
         }
 
         .borboleta-imagem {
-            max-width: 140px;
+            max-width: 165px; /* Um tiquinho maior como você queria! */
             pointer-events: none;
             user-select: none;
-            animation: float 6s ease-in-out infinite;
+            animation: floatBrilho 6s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-6px); }
+        @keyframes floatBrilho {
+            0%, 100% { transform: translateY(0px); filter: drop-shadow(0 0 0px rgba(0,0,0,0)); }
+            50% { transform: translateY(-6px); filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); }
         }
 
         .categoria-flutuante {
@@ -175,22 +179,25 @@
             text-transform: uppercase;
             cursor: pointer;
             letter-spacing: 1px;
-            background: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.9);
             padding: 4px 8px;
             border-radius: 4px;
             z-index: 10;
+            border: 0.5px solid rgba(0,0,0,0.05);
         }
 
-        #cat-catalogo   { top: 5%; left: 50%; transform: translateX(-50%); }
-        #cat-generos    { top: 15%; left: 8%; }
-        #cat-paises     { top: 18%; right: 8%; }
-        #cat-filmes     { top: 35%; left: 5%; }
-        #cat-series     { top: 40%; right: 5%; }
-        #cat-animes     { top: 55%; left: 8%; }
-        #cat-animacoes  { top: 60%; right: 8%; }
-        #cat-doramas    { bottom: 25%; left: 50%; transform: translateX(-50%); }
-        #cat-autores    { bottom: 8%; left: 10%; }
-        #cat-diretores  { bottom: 5%; right: 10%; }
+        /* Realocação Cirúrgica das 11 Categorias ao redor da Borboleta */
+        #cat-catalogo   { top: 2%; left: 50%; transform: translateX(-50%); }
+        #cat-generos    { top: 15%; left: 5%; }
+        #cat-paises     { top: 15%; right: 5%; }
+        #cat-filmes     { top: 32%; left: 3%; }
+        #cat-series     { top: 32%; right: 3%; }
+        #cat-animes     { top: 50%; left: 3%; }
+        #cat-animacoes  { top: 50%; right: 3%; }
+        #cat-doramas    { bottom: 22%; left: 6%; }
+        #cat-livros     { bottom: 22%; right: 6%; } /* Longe da borboleta! */
+        #cat-autores    { bottom: 5%; left: 12%; }
+        #cat-diretores  { bottom: 5%; right: 12%; }
 
         footer {
             text-align: center;
@@ -202,7 +209,7 @@
         }
 
         /* ==========================================================================
-           GRID CATÁLOGO & LISTAGENS
+           GRID DE PÔSTERES (3 COLUNAS)
            ========================================================================== */
         .titulo-aba {
             font-family: var(--font-alternativa);
@@ -262,28 +269,47 @@
             font-weight: bold;
         }
 
+        /* ==========================================================================
+           ABA DE LISTAGENS CORRIGIDA (ALINHAMENTO SEGURO DE DUAS COLUNAS)
+           ========================================================================== */
         .grid-listagem {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px 10px;
+            gap: 15px 20px;
             padding: 0 20px;
-            font-size: 11px;
-            text-transform: uppercase;
             margin-bottom: 40px;
         }
 
         .linha-genero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             cursor: pointer;
             color: var(--texto-mutado);
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--linha-fina);
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .nome-item-lista {
+            font-size: 11px;
+            text-transform: uppercase;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            padding-right: 5px;
+            flex: 1;
         }
-        .linha-genero span { color: var(--texto-escuro); margin-left: 5px; font-weight: bold;}
+
+        .qtd-item-lista {
+            font-size: 11px;
+            color: var(--texto-escuro);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
 
         /* ==========================================================================
-           MODAL DE DETALHES (FIX DO SCROLL E TÍTULOS)
+           MODAL DE DETALHES (FIX DO SCROLL E TÍTULOS GRANDES)
            ========================================================================== */
         .modal-overlay {
             position: fixed;
@@ -346,7 +372,6 @@
             hyphens: auto;
         }
 
-        /* Nome do autor clicável super chique */
         .autor-diretor-modal {
             font-style: italic;
             font-size: 11px;
@@ -356,7 +381,6 @@
             text-decoration: underline;
             text-underline-offset: 3px;
         }
-        .autor-diretor-modal:active { color: var(--texto-mutado); }
 
         .linha-tecnica {
             font-size: 11px;
@@ -489,7 +513,7 @@
         <form class="form-busca" id="formBusca" action="javascript:void(0);">
             <div class="wrapper-input">
                 <span class="icone-busca">⚲</span>
-                <input type="search" id="campoPesquisa" class="input-busca" placeholder="Pesquisar...">
+                <input type="search" id="campoPesquisa" class="input-busca" placeholder="Pesquerizar...">
             </div>
         </form>
         <div id="subtextoDinamicoBusca" class="subtexto-busca">CARREGANDO ACERVO...</div>
@@ -577,7 +601,7 @@
          ::`;
 
         // ==========================================================================
-        // LÓGICA DE ORDENAÇÃO GLOBAL E INTELIGÊNCIA DE DADOS
+        // LÓGICA DE ORDENAÇÃO DECRESCENTE GLOBAL
         // ==========================================================================
         function ordenarDecrescente(obras) {
             return obras.sort((a, b) => {
@@ -595,15 +619,12 @@
             });
         }
 
-        // Ajuda o site a encontrar o autor ou diretor, mesmo se vc usar apenas 1 coluna
         function obterValorAutorDiretor(obra, tipoTarget) {
-            if(tipoTarget === 'autor_col') return obra.autor || obra.diretor_autor || "";
-            if(tipoTarget === 'diretor_col') return obra.diretor || obra.diretor_autor || "";
-            return obra[tipoTarget] || "";
+            return obra.diretor_autor || "";
         }
 
         // ==========================================================================
-        // INICIALIZAÇÃO & MEMÓRIA (HISTORY API OTIMIZADA)
+        // HISTORY API RECONSTRUÍDA (FIM DA TELA BRANCA)
         // ==========================================================================
         window.addEventListener('load', async () => {
             history.replaceState({ nav: 'home' }, '');
@@ -633,32 +654,35 @@
                 });
             } catch (erro) {
                 console.error(erro);
-                document.getElementById("subtextoDinamicoBusca").textContent = "ERRO AO CARREGAR O ACERVO.";
+                document.getElementById("subtextoDinamicoBusca").textContent = "ERRO AO CONECTAR À PLANILHA.";
             }
         }
 
         window.addEventListener('popstate', (event) => {
-            document.body.style.overflow = "auto"; 
             fecharMiniCinema();
             if (!event.state) {
                 processarEstadoVisual('home');
-                document.getElementById("modalObra").classList.add("hidden");
                 return;
             }
-            if(event.state.nav !== 'modal') document.getElementById("modalObra").classList.add("hidden");
             processarEstadoVisual(event.state.nav, event.state.param);
         });
 
         function navegarPara(destino, parametro = null) {
-            document.body.style.overflow = "auto"; 
-            document.getElementById("modalObra").classList.add("hidden");
-            fecharMiniCinema();
-            
             history.pushState({ nav: destino, param: parametro }, '');
             processarEstadoVisual(destino, parametro);
         }
 
+        // CONTROLADOR DE ESTADOS PERFEITO (NUNCA DEIXA PÁGINA EM BRANCO)
         function processarEstadoVisual(nav, param) {
+            if (nav === 'modal') {
+                abrirModalVisual(param);
+                return;
+            }
+
+            // Se a rota não for modal, garante que o modal fecha e o scroll destrava
+            document.getElementById("modalObra").classList.add("hidden");
+            document.body.style.overflow = "auto";
+
             document.getElementById("viewHome").classList.add("hidden");
             document.getElementById("viewCatalogo").classList.add("hidden");
             document.getElementById("viewListagem").classList.add("hidden");
@@ -682,7 +706,13 @@
             else if (nav === 'filtro') {
                 document.getElementById("viewCatalogo").classList.remove("hidden");
                 let filtradas = bancoDadosObras.filter(o => {
-                    let alvo = obterValorAutorDiretor(o, param.coluna).toLowerCase();
+                    if(param.coluna === 'autor_col') {
+                        return (o.categoria || "").toLowerCase() === 'livro' && (o.diretor_autor || "").toLowerCase().includes(param.valor.toLowerCase());
+                    }
+                    if(param.coluna === 'diretor_col') {
+                        return (o.categoria || "").toLowerCase() !== 'livro' && (o.diretor_autor || "").toLowerCase().includes(param.valor.toLowerCase());
+                    }
+                    let alvo = (o[param.coluna] || "").toLowerCase();
                     return alvo.includes(param.valor.toLowerCase());
                 });
                 filtradas = ordenarDecrescente(filtradas);
@@ -698,20 +728,16 @@
                 document.getElementById("campoPesquisa").value = param;
                 executarBusca(param);
             }
-            else if (nav === 'modal') {
-                abrirModalVisual(param);
-            }
         }
 
         // ==========================================================================
-        // BUSCA COM MEMÓRIA & SUMIR TECLADO (BLUR)
+        // FORM BUSCA COM BLUR DO TECLADO
         // ==========================================================================
         function configurarBuscadorInteligente() {
             const input = document.getElementById("campoPesquisa");
             const form = document.getElementById("formBusca");
             let timeoutBusca;
 
-            // Busca enquanto digita
             input.addEventListener("input", (e) => {
                 let termo = e.target.value.toLowerCase().trim();
                 clearTimeout(timeoutBusca);
@@ -722,10 +748,9 @@
                 }, 300); 
             });
 
-            // Se a Samy apertar a lupa ou o "Ir" do celular, esconde o teclado
             form.addEventListener("submit", (e) => {
                 e.preventDefault();
-                input.blur(); 
+                input.blur(); // Esconde o teclado nativo imediatamente!
             });
         }
 
@@ -753,17 +778,14 @@
             obras.forEach(obra => {
                 const item = document.createElement("div");
                 item.className = `item-obra ${obra.status_link === 'OFF' ? 'status-off' : ''}`;
-                item.onclick = () => {
-                    history.pushState({ nav: 'modal', id_obra: obra.id_obra }, '');
-                    abrirModalVisual(obra.id_obra);
-                };
+                item.onclick = () => navegarPara('modal', obra.id_obra);
                 item.innerHTML = `<img class="poster-imagem" src="${obra.capa_vertical}" alt="${obra.titulo_principal}">`;
                 grid.appendChild(item);
             });
         }
 
         // ==========================================================================
-        // LISTAGEM DINÂMICA (Gêneros, Diretores, Países)
+        // LISTAGEM DUAL (AUTORES VS DIRETORES BASEADO NA CATEGORIA)
         // ==========================================================================
         function renderizarListaGenerica(colunaTarget) {
             const container = document.getElementById("containerListagem");
@@ -777,8 +799,17 @@
             if(colunaTarget === 'pais') nomeAba = "PAÍSES";
 
             bancoDadosObras.forEach(obra => {
-                let valorCell = obterValorAutorDiretor(obra, colunaTarget);
-                valorCell.split(",").forEach(txt => {
+                let cat = (obra.categoria || "").toLowerCase();
+                
+                // Filtro inteligente: Autores só puxam Livros. Diretores puxam o resto.
+                if(colunaTarget === 'autor_col' && cat !== 'livro') return;
+                if(colunaTarget === 'diretor_col' && cat === 'livro') return;
+
+                let cell = obra.diretor_autor || "";
+                if(colunaTarget === 'generos') cell = obra.generos || "";
+                if(colunaTarget === 'pais') cell = obra.pais || "";
+
+                cell.split(",").forEach(txt => {
                     let nome = txt.trim();
                     if(nome) mapaDados[nome] = (mapaDados[nome] || 0) + 1;
                 });
@@ -789,18 +820,20 @@
             
             document.getElementById("tituloAbaListagem").innerHTML = `${nomeAba} <span>${arr.length}</span>`;
             arr.forEach(item => {
-                container.innerHTML += `<div class="linha-genero" onclick="navegarPara('filtro', {coluna: '${colunaTarget}', valor: '${item.nome}'})">${item.nome} <span>${item.qtd}</span></div>`;
+                container.innerHTML += `
+                    <div class="linha-genero" onclick="navegarPara('filtro', {coluna: '${colunaTarget}', valor: '${item.nome.replace(/'/g, "\\'")}'})">
+                        <div class="nome-item-lista">${item.nome}</div>
+                        <div class="qtd-item-lista">${item.qtd}</div>
+                    </div>`;
             });
         }
 
         // ==========================================================================
-        // MODAL (FICHA DA OBRA) - ROTA DA FOFOCA CLICÁVEL
+        // MODAL (FICHA TÉCNICA REPARADA)
         // ==========================================================================
         function abrirModalVisual(id) {
             const obra = bancoDadosObras.find(o => o.id_obra === id);
             if(!obra) return;
-            
-            fecharMiniCinema();
 
             const cat = (obra.categoria || "").toLowerCase();
             let html = "";
@@ -814,9 +847,9 @@
 
             let duracaoPaginas = obra.duracao_paginas ? ` | ${obra.duracao_paginas}` : "";
             
-            // O nome do autor agora é uma ponte clicável para ver os outros trabalhos dele
-            let nomeArtista = obterValorAutorDiretor(obra, 'autor_col') || "?";
-            let linkArtistaHtml = `<div class="autor-diretor-modal" onclick="navegarPara('filtro', {coluna: 'autor_col', valor: '${nomeArtista}'})">por ${nomeArtista}</div>`;
+            let nomeArtista = obra.diretor_autor || "?";
+            let colFiltro = cat === 'livro' ? 'autor_col' : 'diretor_col';
+            let linkArtistaHtml = `<div class="autor-diretor-modal" onclick="navegarPara('filtro', {coluna: '${colFiltro}', valor: '${nomeArtista.replace(/'/g, "\\'")}'})">por ${nomeArtista}</div>`;
             
             if (cat === 'livro') {
                 let link = bancoLinksUnicos[id] || {};
@@ -960,7 +993,7 @@
 
             document.getElementById("modalConteudoDinamico").innerHTML = html;
             document.getElementById("modalObra").classList.remove("hidden");
-            document.body.style.overflow = "hidden"; // Protege apenas o fundo
+            document.body.style.overflow = "hidden"; // Trava o scroll de fundo perfeitamente
         }
 
         function dispararMiniCinema(url, elClick, storageKey) {
@@ -973,15 +1006,6 @@
             w.classList.remove("hidden");
             if(img) img.classList.add("hidden");
             w.scrollIntoView({behavior: 'smooth', block: 'start'});
-        }
-
-        function fecharMiniCinema() {
-            const w = document.getElementById("wrapperPlayerVideo");
-            const i = document.getElementById("iframePlayerVideo");
-            const img = document.getElementById("modalImagemFicha");
-            if(i) i.src = "";
-            if(w) w.classList.add("hidden");
-            if(img) img.classList.remove("hidden");
         }
 
         function marcarComoVisto(el, key) {
@@ -1010,7 +1034,7 @@
             generos.split(",").forEach(g => { 
                 let gen = g.trim();
                 if(gen) {
-                    html += `<span class="tag-modal" onclick="navegarPara('filtro', {coluna: 'generos', valor: '${gen}'})">${gen}</span> `; 
+                    html += `<span class="tag-modal" onclick="navegarPara('filtro', {coluna: 'generos', valor: '${gen.replace(/'/g, "\\'")}'})">${gen}</span> `; 
                 }
             });
             return html;
